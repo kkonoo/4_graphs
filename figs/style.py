@@ -45,8 +45,10 @@ def _korean_font():
 
 KO = _korean_font()
 
+# 한글 폰트를 앞에, DejaVu Sans 를 뒤에 두면 한글 폰트에 없는 글자
+# (예: Erdős 의 ő)는 DejaVu 로 대체됩니다.
 plt.rcParams.update({
-    "font.family": KO if KO else "DejaVu Sans",
+    "font.family": ([KO, "DejaVu Sans"] if KO else ["DejaVu Sans"]),
     "font.size": 11,
     "axes.unicode_minus": False,        # 한글 폰트에서 마이너스 깨짐 방지
     "axes.spines.top": False, "axes.spines.right": False,

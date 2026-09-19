@@ -15,10 +15,10 @@ format:
         이미 설치되어 있고 python-igraph와 leidenalg만 pip install 하면 됩니다.
         python-louvain(import 이름 community)은 최신 numpy/pandas 환경에서 빌드에
         실패하므로 쓰지 않고, networkx 내장 louvain_communities를 사용합니다.
-        Part 2(딥러닝)는 torch-geometric을 설치하고 런타임 유형을 T4 GPU로 바꿉니다.
-        단일세포 실습에는 scanpy가 필요합니다.
+        Part 2(딥러닝)는 torch-geometric을 설치합니다. 실습 코드는 CPU에서 돌아가도록 짰습니다.
+        단일세포 실습에는 scanpy, 11의 node2vec 실습에는 gensim이 필요합니다.
         실습 데이터: Zachary karate club(nx 내장), STRING PPI 서브네트워크(string-db.org
-        에서 TSV 다운로드), PBMC 3k(sc.datasets.pbmc3k_processed), Cora와 ENZYMES
+        에서 TSV 다운로드), PBMC 3k(sc.datasets.pbmc3k_processed), Cora
         (torch_geometric.datasets).
         ">
 ---
@@ -31,7 +31,7 @@ format:
 
 - [colab.research.google.com](https://colab.research.google.com/) 접속 → Google 계정 로그인 → **새 노트북**
 - 각 챕터의 🐍 실습 블록 코드를 셀에 붙여넣고 `Shift + Enter`
-- Part 2의 GNN 데모만 GPU가 필요합니다 → **런타임 → 런타임 유형 변경 → T4 GPU**
+- Part 2 실습도 CPU에서 몇 분 안에 끝나도록 짰습니다. GPU로 옮기는 코드는 넣지 않았으므로 런타임 유형은 바꾸지 않아도 됩니다
 
 ------------------------------------------------------------------------
 
@@ -73,6 +73,12 @@ print(torch.__version__, torch_geometric.__version__, torch.cuda.is_available())
 !pip install -q scanpy
 ```
 
+### 4) 노드 임베딩 실습 (11) {#c90-s2-4}
+
+```bash
+!pip install -q gensim python-igraph leidenalg
+```
+
 ------------------------------------------------------------------------
 
 ## 3. 실습 데이터 {#c90-s3}
@@ -81,9 +87,8 @@ print(torch.__version__, torch_geometric.__version__, torch.cuda.is_available())
 |---|---|---|
 | Zachary karate club | 01 ~ 06 전반 | `nx.karate_club_graph()` — 내장 |
 | STRING PPI 서브네트워크 | 02, 03, 07 | [string-db.org](https://string-db.org/)에서 유전자 목록 검색 → TSV 다운로드 |
-| PBMC 3k (단일세포) | 01, 05, 13 | `sc.datasets.pbmc3k_processed()` |
+| PBMC 3k (단일세포) | 01, 05, 10, 13 | `sc.datasets.pbmc3k_processed()` |
 | Cora | 12 | `torch_geometric.datasets.Planetoid` |
-| ENZYMES | 12 | `torch_geometric.datasets.TUDataset` |
 
 ::: {.callout-tip collapse="true"}
 ### 세션이 끊겨도 괜찮습니다

@@ -14,6 +14,17 @@ project:
     - index.qmd
     - chapters/01_why_networks.qmd
     - chapters/02_representation.qmd
+    - chapters/03_metrics.qmd
+    - chapters/04_random_null.qmd
+    - chapters/05_community.qmd
+    - chapters/06_propagation.qmd
+    - chapters/07_practice.qmd
+    - chapters/08_nn_basics.qmd
+    - chapters/09_training.qmd
+    - chapters/10_architectures.qmd
+    - chapters/11_node_embedding.qmd
+    - chapters/12_gnn.qmd
+    - chapters/13_frontiers.qmd
     - chapters/90_colab_setup.qmd
     - chapters/91_glossary.qmd
 
@@ -42,24 +53,30 @@ website:
             href: chapters/01_why_networks.qmd
           - text: "02. 그래프의 표현"
             href: chapters/02_representation.qmd
-          # - text: "03. 네트워크 정량화와 중심성"
-          #   href: chapters/03_metrics.qmd
-          # - text: "04. 랜덤 그래프와 null model"
-          #   href: chapters/04_random_null.qmd
-          # - text: "05. 커뮤니티와 모듈"
-          #   href: chapters/05_community.qmd
-          # - text: "06. 전파와 예측"
-          #   href: chapters/06_propagation.qmd
-          # - text: "07. 실무 — 데이터·편향·시각화"
-          #   href: chapters/07_practice.qmd
-      # - section: "Part 2. 신경망과 그래프 학습"
-      #   contents:
-      #     - chapters/08_nn_basics.qmd
-      #     - chapters/09_training.qmd
-      #     - chapters/10_architectures.qmd
-      #     - chapters/11_node_embedding.qmd
-      #     - chapters/12_gnn.qmd
-      #     - chapters/13_frontiers.qmd
+          - text: "03. 네트워크 정량화와 중심성"
+            href: chapters/03_metrics.qmd
+          - text: "04. 랜덤 그래프와 null model"
+            href: chapters/04_random_null.qmd
+          - text: "05. 커뮤니티와 모듈"
+            href: chapters/05_community.qmd
+          - text: "06. 전파와 예측"
+            href: chapters/06_propagation.qmd
+          - text: "07. 실무 — 데이터·편향·시각화"
+            href: chapters/07_practice.qmd
+      - section: "Part 2. 신경망과 그래프 학습"
+        contents:
+          - text: "08. 회귀에서 신경망으로"
+            href: chapters/08_nn_basics.qmd
+          - text: "09. 학습의 실제"
+            href: chapters/09_training.qmd
+          - text: "10. 알아둘 만한 아키텍처"
+            href: chapters/10_architectures.qmd
+          - text: "11. 그래프 임베딩"
+            href: chapters/11_node_embedding.qmd
+          - text: "12. 그래프 신경망"
+            href: chapters/12_gnn.qmd
+          - text: "13. 최근 흐름과 논문 읽는 눈"
+            href: chapters/13_frontiers.qmd
       - section: "부록"
         contents:
           - text: "90. Colab 환경 설정"
