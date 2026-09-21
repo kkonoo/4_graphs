@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Eunji Ha">
+<meta name="dcterms.date" content="2026-09-21">
+<meta name="description" content="생물학에서 그래프는 어디서 오는가, 그래프 딥러닝의 최근 흐름, 그리고 GNN 논문을 읽을 때 확인할 것">
+
+<title>13. 최근 흐름과 논문 읽는 눈 – 4. 네트워크와 딥러닝</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/90_colab_setup.html" rel="next">
+<link href="../chapters/12_gnn.html" rel="prev">
+<link href="../images/logo.ico/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-7f128302b46659ec05c1cdf12d27b5f1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<meta name="ai-title" content="13. 최근 흐름과 논문 읽는 눈">
+<meta name="ai-context" content="
+생물학에서 그래프의 엣지 출처: 분자(화학 결합, 정의됨), 지식 그래프(DB가 모은 관계, Decagon, TxGNN),
+공간 전사체(물리적 거리, STAGATE, GraphST), 단일세포(발현 kNN, k를 우리가 정함, scGNN).
+벤치마크: 공간 정보가 발현만 쓴 군집화보다 일관되게 낫지 않음(Cheng 2023), 단일세포 foundation
+model zero-shot이 단순한 방법에 뒤지는 경우(Kedzierska 2025), 교란 효과 예측 딥러닝이 선형
+baseline을 넘지 못함(Ahlmann-Eltze 2025). 최근 흐름(CS224W 2025년 가을): 그래프 트랜스포머(라플라시안
+고유벡터 위치 인코딩, Graphormer, GraphGPS), 이종 그래프(R-GCN), 관계형 딥러닝(RelBench), KG
+foundation model(ULTRA, 57개 KG), LLM + 그래프, 생성 모델(GraphRNN, DiGress, EDM, RFdiffusion).
+논문 읽는 눈 체크리스트: 그래프 없는 baseline, 그래프만 쓴 baseline, 그래프 구성(k, 임계값, DB),
+n은 세포인가 환자인가, split, 라벨의 출처, 여러 split. 실측(PBMC 3k, PCA 50, kNN k=15, 시드 5,
+balanced accuracy): 라벨 5%에서 로지스틱 0.838, 레이블 전파 0.886, GCN 0.947. 같은 그래프의 Leiden
+군집(생물학적 이름 없음)을 라벨로 주면 GCN 0.961로 더 높음 → 라벨이 그래프에서 나오면 순환.
+k = 5/15/50에서 레이블 전파 0.897/0.886/0.776, GCN 0.919/0.947/0.911. 기증자 1명이라 n = 1.
+강의 전체 회고: 세 주제(엣지는 선택, null 없이는 숫자 무의미, 그림은 측정이 아님) 회수.
+">
+
+
+<link rel="stylesheet" href="../assets/html.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">4. 네트워크와 딥러닝</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/kkonoo/4_graphs"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/08_nn_basics.html">Part 2. 신경망과 그래프 학습</a></li><li class="breadcrumb-item"><a href="../chapters/13_frontiers.html">13. 최근 흐름과 논문 읽는 눈</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Home</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 1. 네트워크와 그래프 이론</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01_why_networks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01. 왜 네트워크인가</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02_representation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02. 그래프의 표현</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03_metrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03. 네트워크 정량화와 중심성</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04_random_null.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04. 랜덤 그래프와 null model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05_community.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05. 커뮤니티와 모듈</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/06_propagation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06. 전파와 예측</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/07_practice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07. 실무 — 데이터·편향·시각화</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 2. 신경망과 그래프 학습</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/08_nn_basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08. 회귀에서 신경망으로</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/09_training.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09. 학습의 실제</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/10_architectures.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10. 알아둘 만한 아키텍처</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/11_node_embedding.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11. 그래프 임베딩</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/12_gnn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12. 그래프 신경망</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/13_frontiers.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">13. 최근 흐름과 논문 읽는 눈</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">부록</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/90_colab_setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">90. Colab 환경 설정</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/91_glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">91. 용어집</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#c13-s1" id="toc-c13-s1" class="nav-link active" data-scroll-target="#c13-s1">1. 생물학에서 그래프는 어디서 오나 🧬</a>
+  <ul>
+  <li><a href="#c13-s1-1" id="toc-c13-s1-1" class="nav-link" data-scroll-target="#c13-s1-1">1) 네 가지 응용, 네 가지 엣지</a></li>
+  <li><a href="#c13-s1-2" id="toc-c13-s1-2" class="nav-link" data-scroll-target="#c13-s1-2">2) ⚠️ 벤치마크는 뭐라고 하나</a></li>
+  </ul></li>
+  <li><a href="#c13-s2" id="toc-c13-s2" class="nav-link" data-scroll-target="#c13-s2">2. 최근 흐름 🔭</a>
+  <ul>
+  <li><a href="#c13-s2-1" id="toc-c13-s2-1" class="nav-link" data-scroll-target="#c13-s2-1">1) 무엇이 새로 나왔나</a></li>
+  <li><a href="#c13-s2-2" id="toc-c13-s2-2" class="nav-link" data-scroll-target="#c13-s2-2">2) 생성 모델 — 한 단락</a></li>
+  </ul></li>
+  <li><a href="#c13-s3" id="toc-c13-s3" class="nav-link" data-scroll-target="#c13-s3">3. ⚠️ 논문 읽는 눈 🧐</a>
+  <ul>
+  <li><a href="#c13-s3-1" id="toc-c13-s3-1" class="nav-link" data-scroll-target="#c13-s3-1">1) 체크리스트</a></li>
+  <li><a href="#c13-s3-2" id="toc-c13-s3-2" class="nav-link" data-scroll-target="#c13-s3-2">2) 실측 — “GNN으로 세포유형을 분류했다”</a></li>
+  </ul></li>
+  <li><a href="#요약" id="toc-요약" class="nav-link" data-scroll-target="#요약">📝 요약</a></li>
+  <li><a href="#강의를-마치며" id="toc-강의를-마치며" class="nav-link" data-scroll-target="#강의를-마치며">🗺️ 강의를 마치며</a></li>
+  <li><a href="#더-읽을거리" id="toc-더-읽을거리" class="nav-link" data-scroll-target="#더-읽을거리">➕ 더 읽을거리</a>
+  <ul>
+  <li><a href="#생물의학-응용" id="toc-생물의학-응용" class="nav-link" data-scroll-target="#생물의학-응용">생물의학 응용</a></li>
+  <li><a href="#벤치마크-단순한-방법과의-비교" id="toc-벤치마크-단순한-방법과의-비교" class="nav-link" data-scroll-target="#벤치마크-단순한-방법과의-비교">벤치마크 — 단순한 방법과의 비교</a></li>
+  <li><a href="#최근-흐름" id="toc-최근-흐름" class="nav-link" data-scroll-target="#최근-흐름">최근 흐름</a></li>
+  <li><a href="#생성-모델" id="toc-생성-모델" class="nav-link" data-scroll-target="#생성-모델">생성 모델</a></li>
+  <li><a href="#평가와-재현성" id="toc-평가와-재현성" class="nav-link" data-scroll-target="#평가와-재현성">평가와 재현성</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-body" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/08_nn_basics.html">Part 2. 신경망과 그래프 학습</a></li><li class="breadcrumb-item"><a href="../chapters/13_frontiers.html">13. 최근 흐름과 논문 읽는 눈</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">13. 최근 흐름과 논문 읽는 눈</h1>
+</div>
+
+<div>
+  <div class="description">
+    생물학에서 그래프는 어디서 오는가, 그래프 딥러닝의 최근 흐름, 그리고 GNN 논문을 읽을 때 확인할 것
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-body">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Eunji Ha </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 21, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>🎯 학습 목표
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>이 챕터를 마치면 다음을 할 수 있습니다.</p>
+<ul>
+<li>분자·지식 그래프·공간 전사체·단일세포에서 <strong>엣지가 어디서 왔는지</strong> 구분할 수 있다</li>
+<li>그래프 딥러닝의 최근 흐름(그래프 트랜스포머, 이종 그래프, 관계형 딥러닝, 지식 그래프 foundation model, LLM + 그래프, 생성 모델)을 한 문장씩 설명할 수 있다</li>
+<li>⚠️ GNN 논문의 성능 숫자를 읽기 전에 확인할 체크리스트를 쓸 수 있다</li>
+<li>⚠️ 그래프로 만든 라벨을 같은 그래프로 예측하는 <strong>순환</strong>을 알아볼 수 있다</li>
+<li>강의 전체의 세 가지 주제를 자기 분석에 적용할 수 있다</li>
+</ul>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>🤔 <strong>생각해볼 질문</strong></p>
+<p>리뷰어로서 “GNN으로 세포유형을 95% 정확도로 분류했다”는 원고를 받았습니다. 무엇부터 물어보시겠습니까?</p>
+</blockquote>
+<hr>
+<section id="c13-s1" class="level2">
+<h2 class="anchored" data-anchor-id="c13-s1">1. 생물학에서 그래프는 어디서 오나 🧬</h2>
+<section id="c13-s1-1" class="level3">
+<h3 class="anchored" data-anchor-id="c13-s1-1">1) 네 가지 응용, 네 가지 엣지</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>응용</th>
+<th>노드</th>
+<th>엣지는 어디서 왔나</th>
+<th>예</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>분자</strong></td>
+<td>원자</td>
+<td>화학 결합 — 정의된 엣지</td>
+<td>분자 그래프 합성곱 모델(Yang et al.&nbsp;2019), 항생제 후보 halicin(Stokes et al.&nbsp;2020)</td>
+</tr>
+<tr class="even">
+<td><strong>지식 그래프</strong></td>
+<td>약물·단백질·질병·표현형</td>
+<td>DB가 모은 관계 — 🔗 <a href="../chapters/07_practice.html#c07-s2">07 §2</a>의 연구 편향을 물려받음</td>
+<td>Decagon(Zitnik et al.&nbsp;2018), TxGNN(Huang et al.&nbsp;2024)</td>
+</tr>
+<tr class="odd">
+<td><strong>공간 전사체</strong></td>
+<td>spot 또는 세포</td>
+<td>물리적 거리 — 반경 또는 k를 우리가 정함</td>
+<td>STAGATE(Dong &amp; Zhang 2022), GraphST(Long et al.&nbsp;2023)</td>
+</tr>
+<tr class="even">
+<td><strong>단일세포</strong></td>
+<td>세포</td>
+<td>발현이 비슷한 세포끼리 — <strong>k를 우리가 정함</strong> (🔗 <a href="../chapters/01_why_networks.html#c01-s3">01 §3</a>)</td>
+<td>scGNN(Wang et al.&nbsp;2021)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>💡 위에서 아래로 갈수록 엣지가 <strong>측정에서 멀어지고 선택에 가까워집니다.</strong> 화학 결합은 정의이고, PPI는 측정 + 편향이며, 세포 kNN 그래프는 우리가 만든 것입니다 (주제 ①)</li>
+<li><strong>분자</strong> — Yang et al.(2019)의 그래프 합성곱 모델은 고정된 분자 기술자(descriptor)를 쓰는 모델과 같거나 나은 성능을 보고했습니다. Stokes et al.(2020)은 항균 활성을 예측하는 심층 신경망을 학습해 여러 화합물 라이브러리를 훑었고, Drug Repurposing Hub에서 기존 항생제와 구조가 다른 halicin을 찾았습니다</li>
+<li><strong>지식 그래프</strong> — Decagon은 단백질–단백질, 약물–표적, 그리고 부작용 종류마다 다른 엣지로 표현한 약물–약물 관계를 한 그래프에 넣고 GCN으로 병용 부작용을 예측했습니다. TxGNN은 의학 지식 그래프로 학습해 질병 17,080개에 대해 약물의 적응증·금기를 순위 매깁니다</li>
+<li><strong>공간 전사체</strong> — STAGATE는 그래프 어텐션 오토인코더로 이웃 spot 간 유사도를 적응적으로 배우고(🔗 <a href="../chapters/10_architectures.html#c10-s3">10 §3</a>), GraphST는 공간적으로 인접한 spot의 표현을 가깝게 만드는 대조 학습을 GNN과 결합합니다</li>
+</ul>
+</section>
+<section id="c13-s1-2" class="level3">
+<h3 class="anchored" data-anchor-id="c13-s1-2">2) ⚠️ 벤치마크는 뭐라고 하나</h3>
+<ul>
+<li><strong>공간 전사체 군집화</strong> — 공간·조직 정보를 더하면 일부 데이터에서는 정확도가 올랐지만, 발현만 쓴 군집화보다 <strong>일관되게</strong> 낫지는 않았습니다 (Cheng et al.&nbsp;2023)
+<ul>
+<li>다른 벤치마크에서는 모든 데이터에 가장 좋은 단일 방법이 없었고(Kang et al.&nbsp;2025), 평균 순위 1위는 GNN이 아닌 베이지안 통계 방법이었습니다(Hu et al.&nbsp;2024)</li>
+</ul></li>
+<li><strong>단일세포 foundation model</strong> — Geneformer와 scGPT를 추가 학습 없이(zero-shot) 평가하자, 일부 경우 더 단순한 방법에 뒤졌습니다 (Kedzierska et al.&nbsp;2025)</li>
+<li><strong>유전자 교란 효과 예측</strong> — 딥러닝 모델 여러 개 중 어느 것도 단순한 선형 baseline을 넘지 못했습니다 (Ahlmann-Eltze et al.&nbsp;2025)</li>
+<li>✅ 09 §3의 결론이 그대로입니다 — <strong>누가 이길지는 재봐야 압니다.</strong> 새 방법이 나쁘다는 뜻이 아니라, 비교 없이 믿을 수 없다는 뜻입니다</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="c13-s2" class="level2">
+<h2 class="anchored" data-anchor-id="c13-s2">2. 최근 흐름 🔭</h2>
+<section id="c13-s2-1" class="level3">
+<h3 class="anchored" data-anchor-id="c13-s2-1">1) 무엇이 새로 나왔나</h3>
+<p>Stanford CS224W(2025년 가을)의 후반부 강의 제목이 지금의 흐름을 잘 보여줍니다 — 그래프 트랜스포머, 이종 그래프, 지식 그래프, 관계형 딥러닝, 지식 그래프 foundation model, LLM + GNN, 에이전트 + 그래프, 그래프 생성 모델.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>흐름</th>
+<th>한 줄 요약</th>
+<th>무엇을 풀려고 하나</th>
+<th>대표</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>그래프 트랜스포머</strong></td>
+<td>트랜스포머의 어텐션을 그래프로 — 그래프 구조는 <strong>위치·구조 인코딩</strong>으로 넣음</td>
+<td>먼 노드 사이의 정보 전달, 메시지 전달의 표현력 한계 (🔗 <a href="../chapters/12_gnn.html#c12-s3">12 §3</a>)</td>
+<td>Dwivedi &amp; Bresson 2021; Ying et al.&nbsp;2021; Rampášek et al.&nbsp;2022</td>
+</tr>
+<tr class="even">
+<td><strong>이종 그래프</strong></td>
+<td>노드·엣지 종류가 여럿 (약물–표적–질병)</td>
+<td>관계 종류마다 다른 의미</td>
+<td>R-GCN (Schlichtkrull et al.&nbsp;2018)</td>
+</tr>
+<tr class="odd">
+<td><strong>관계형 딥러닝</strong></td>
+<td>관계형 DB의 행 = 노드, 테이블 간 키 = 엣지인 시간·이종 그래프</td>
+<td>테이블을 손으로 합치는 특징 공학</td>
+<td>Fey et al.&nbsp;2024; RelBench (Robinson et al.&nbsp;2024)</td>
+</tr>
+<tr class="even">
+<td><strong>KG foundation model</strong></td>
+<td>여러 지식 그래프로 한 번 학습, 처음 보는 그래프에 바로 적용</td>
+<td>그래프마다 재학습 (🔗 <a href="../chapters/11_node_embedding.html#c11-s4">11 §4</a>)</td>
+<td>ULTRA (Galkin et al.&nbsp;2024)</td>
+</tr>
+<tr class="odd">
+<td><strong>LLM + 그래프</strong></td>
+<td>LLM이 예측기·인코더·정렬기로 그래프와 결합</td>
+<td>텍스트가 붙은 그래프</td>
+<td>Jin et al.&nbsp;2024 (정리)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>그래프 트랜스포머의 위치 인코딩</strong> — Dwivedi &amp; Bresson(2021)은 어텐션을 이웃 연결에 맞추고, 라플라시안 고유벡터를 위치 인코딩으로 썼습니다. 🔗 <a href="../chapters/05_community.html#c05-s4">05 §4</a>의 피들러 벡터가 여기서 다시 나옵니다</li>
+<li>Graphormer는 그래프의 구조 정보를 모델에 효과적으로 인코딩하는 것이 핵심이라고 했고(Ying et al.&nbsp;2021), GraphGPS는 위치·구조 인코딩 + 국소 메시지 전달 + <strong>전역 어텐션</strong>의 세 재료를 조합하는 “레시피”로 정리했습니다 (Rampášek et al.&nbsp;2022)</li>
+<li><strong>ULTRA</strong>는 57개 지식 그래프에서 링크 예측을 시험했고, 사전학습한 모델 하나의 zero-shot 성능이 그래프별로 학습한 강한 baseline과 비슷하거나 나은 경우가 많았다고 보고했습니다</li>
+<li><strong>graph foundation model</strong> — 대규모 그래프 데이터로 사전학습해 다양한 그래프 과제에 맞춰 쓰는 모델이라는 구상입니다 (Liu et al.&nbsp;2025). 단일세포 쪽의 foundation model(§1-2)과 같은 기대와 같은 검증 과제를 안고 있습니다</li>
+</ul>
+</section>
+<section id="c13-s2-2" class="level3">
+<h3 class="anchored" data-anchor-id="c13-s2-2">2) 생성 모델 — 한 단락</h3>
+<ul>
+<li>지금까지는 그래프가 <strong>주어졌을 때</strong> 예측했습니다. 생성 모델은 <strong>그래프 자체를 만듭니다</strong></li>
+<li>GraphRNN은 그래프 생성을 노드와 엣지를 차례로 만드는 순서열로 분해한 자기회귀 모델입니다 (You et al.&nbsp;2018)</li>
+<li>확산(diffusion) 모델은 노이즈를 조금씩 걷어내며 생성합니다. 범주형 노드·엣지를 다루는 DiGress(Vignac et al.&nbsp;2023), 3차원 좌표와 원자 종류를 함께 다루며 회전·이동에 등변인 분자 생성 EDM(Hoogeboom et al.&nbsp;2022), 구조 예측망 RoseTTAFold를 단백질 구조 노이즈 제거로 미세조정해 결합 단백질까지 설계한 RFdiffusion(Watson et al.&nbsp;2023)</li>
+<li>⚠️ 생성 모델의 평가는 예측 모델보다 어렵습니다. “그럴듯한 분자”와 “실제로 합성되고 작동하는 분자” 사이에는 실험이 있습니다</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="c13-s3" class="level2">
+<h2 class="anchored" data-anchor-id="c13-s3">3. ⚠️ 논문 읽는 눈 🧐</h2>
+<section id="c13-s3-1" class="level3">
+<h3 class="anchored" data-anchor-id="c13-s3-1">1) 체크리스트</h3>
+<p>GNN 논문(또는 자기 원고)에서 성능 숫자를 보면, 결론을 읽기 전에 이것부터 확인합니다.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>확인할 것</th>
+<th>왜</th>
+<th>강의에서</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>✅ <strong>그래프 없는 baseline</strong>이 있는가 (로지스틱 회귀, 랜덤 포레스트, MLP)</td>
+<td>그래프가 보탠 몫을 알려면 빼 봐야 합니다</td>
+<td>🔗 <a href="../chapters/09_training.html#c09-s3">09 §3</a>, 🔗 <a href="../chapters/12_gnn.html#c12-s2">12 §2</a></td>
+</tr>
+<tr class="even">
+<td>✅ <strong>그래프만 쓴 baseline</strong>이 있는가 (레이블 전파, RWR)</td>
+<td>학습이 보탠 몫을 알려면</td>
+<td>🔗 <a href="../chapters/06_propagation.html#c06-s2">06 §2</a>, 12 §2</td>
+</tr>
+<tr class="odd">
+<td>✅ <strong>그래프를 어떻게 만들었나</strong> — k, 임계값, DB와 버전, 채널</td>
+<td>엣지는 선택이었다. 바꾸면 결과가 바뀌는가</td>
+<td>🔗 <a href="../chapters/01_why_networks.html#c01-s3">01 §3</a>, 🔗 <a href="../chapters/07_practice.html#c07-s1">07 §1</a></td>
+</tr>
+<tr class="even">
+<td>✅ <strong>n은 무엇인가</strong> — 세포인가, 환자인가</td>
+<td>환자 20명의 세포 2만 개는 n = 20</td>
+<td>🔗 <a href="../chapters/09_training.html#c09-s1-3">09 §1</a></td>
+</tr>
+<tr class="odd">
+<td>✅ <strong>어떻게 나눴나</strong> — 무작위 노드인가, 새 환자·새 질병인가</td>
+<td>이웃이 train에 있으면 test는 쉬워집니다</td>
+<td>09 §1, 12 §2</td>
+</tr>
+<tr class="even">
+<td>✅ <strong>라벨은 어디서 왔나</strong></td>
+<td>그래프로 만든 라벨은 그래프가 잘 맞힙니다</td>
+<td>§3-2</td>
+</tr>
+<tr class="odd">
+<td>✅ split·시드를 <strong>여러 번</strong> 바꿨나</td>
+<td>한 split의 순위는 뒤집힙니다</td>
+<td>12 §2</td>
+</tr>
+<tr class="even">
+<td>❌ “GNN을 썼다”</td>
+<td>방법의 이름은 성능의 근거가 아닙니다</td>
+<td>🔗 <a href="../chapters/10_architectures.html#c10-s4">10 §4</a></td>
+</tr>
+<tr class="odd">
+<td>❌ 임베딩·UMAP 그림</td>
+<td>그림은 측정이 아닙니다</td>
+<td>🔗 <a href="../chapters/10_architectures.html#c10-s2-3">10 §2</a></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>baseline</strong> — 구조를 쓰지 않는 baseline과 비교해 보니, 일부 그래프 분류 데이터에서는 GNN이 구조 정보를 아직 활용하지 못하고 있었습니다 (Errica et al.&nbsp;2020)</li>
+<li><strong>n</strong> — 단일세포 차등발현에서 가장 널리 쓰이는 방법들은 생물학적 차이가 없는데도 수백 개의 차등발현 유전자를 찾아냈습니다 (Squair et al.&nbsp;2021). 세포를 독립 표본으로 세는 문제는 🔗 <a href="../chapters/09_training.html#c09-s1-3">09 §1</a>의 pseudoreplication입니다</li>
+<li><strong>누수</strong> — 머신러닝을 도입한 17개 분야에서 누수가 발견됐고, 294편의 논문에 영향을 주었으며 일부는 지나치게 낙관적인 결론으로 이어졌습니다 (Kapoor &amp; Narayanan 2023)</li>
+<li><strong>split</strong> — TxGNN이 스스로 “엄격한 zero-shot 평가”를 내세운 이유가 이것입니다. 무작위로 엣지를 가리면 같은 질병의 다른 약물이 train에 남아 있습니다</li>
+</ul>
+</section>
+<section id="c13-s3-2" class="level3">
+<h3 class="anchored" data-anchor-id="c13-s3-2">2) 실측 — “GNN으로 세포유형을 분류했다”</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../images/c13/scgraph.png" class="img-fluid figure-img"></p>
+<figcaption>PBMC 3k 세포 2,638개. 특징은 PCA 50차원, 그래프는 PCA 공간의 kNN 그래프(대칭화). 라벨을 아는 세포를 유형마다 같은 비율로 뽑고(최소 1개), 10%는 validation, 나머지는 test. 시드 5개의 평균 ± 표준편차. 오른쪽의 “그래프 라벨”은 k = 15 그래프를 Leiden(resolution 1.0)으로 나눈 6개 군집으로, 생물학적 이름이 없습니다.</figcaption>
+</figure>
+</div>
+<p>🤔 질문의 원고를 직접 만들어 봤습니다. PBMC 3k 세포의 kNN 그래프(k = 15) 위에서 세포유형 8개를 분류합니다.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 32%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>라벨을 아는 세포</th>
+<th style="text-align: center;">로지스틱 회귀 (PCA만)</th>
+<th style="text-align: center;">레이블 전파 (그래프만)</th>
+<th style="text-align: center;">GCN (PCA + 그래프)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1% (28개)</td>
+<td style="text-align: center;">0.757 ± 0.055</td>
+<td style="text-align: center;">0.903 ± 0.031</td>
+<td style="text-align: center;"><strong>0.931</strong> ± 0.017</td>
+</tr>
+<tr class="even">
+<td>5% (133개)</td>
+<td style="text-align: center;">0.838 ± 0.030</td>
+<td style="text-align: center;">0.886 ± 0.005</td>
+<td style="text-align: center;"><strong>0.947</strong> ± 0.023</td>
+</tr>
+<tr class="odd">
+<td>20% (527개)</td>
+<td style="text-align: center;">0.888 ± 0.019</td>
+<td style="text-align: center;">0.912 ± 0.009</td>
+<td style="text-align: center;"><strong>0.950</strong> ± 0.015</td>
+</tr>
+</tbody>
+</table>
+<p><em>(balanced accuracy)</em></p>
+<ul>
+<li>원고의 문장은 <strong>사실</strong>입니다. GCN은 라벨 5%로 0.947을 냈고, 그래프 없는 baseline과 학습 없는 baseline을 모두 이겼습니다</li>
+<li>이제 §3-1의 체크리스트를 대 봅니다</li>
+</ul>
+<p><strong>✅ 라벨은 어디서 왔나</strong> — 이 데이터의 세포유형은 PCA 공간의 kNN 그래프(k = 10) 위 군집에 마커 유전자로 이름을 붙인 것입니다 (🔗 <a href="../chapters/10_architectures.html#c10-s2-3">10 §2</a>). 그래서 같은 그래프를 Leiden으로 나눈, <strong>생물학적 이름이 없는</strong> 군집 6개를 라벨로 줘 봤습니다 (그림 오른쪽, 라벨 5%).</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>라벨</th>
+<th style="text-align: center;">로지스틱 회귀</th>
+<th style="text-align: center;">레이블 전파</th>
+<th style="text-align: center;">GCN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>세포유형 (마커로 이름 붙인 군집)</td>
+<td style="text-align: center;">0.838</td>
+<td style="text-align: center;">0.886</td>
+<td style="text-align: center;">0.947</td>
+</tr>
+<tr class="even">
+<td>그래프 라벨 (같은 그래프의 Leiden 군집)</td>
+<td style="text-align: center;">0.810</td>
+<td style="text-align: center;">0.898</td>
+<td style="text-align: center;"><strong>0.961</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>⚠️ GCN은 <strong>이름 없는 그래프 군집을 세포유형보다 더 잘</strong> 맞혔습니다 (라벨 1%에서도 0.961)</li>
+<li>그래프와 라벨이 같은 재료(PCA 공간의 이웃)에서 나왔으니, 높은 정확도는 “GCN이 세포 생물학을 배웠다”가 아니라 “그래프가 자기 군집을 다시 찾았다”일 수 있습니다</li>
+<li>✅ 그래프와 <strong>독립적으로</strong> 정한 라벨로 검증해야 이 순환을 벗어납니다</li>
+</ul>
+<p><strong>✅ 그래프를 어떻게 만들었나</strong> — 라벨 5%에서 k만 바꾸면 (그림 가운데):</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>k</th>
+<th style="text-align: center;">5</th>
+<th style="text-align: center;">15</th>
+<th style="text-align: center;">50</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>세포유형 homophily</td>
+<td style="text-align: center;">0.926</td>
+<td style="text-align: center;">0.902</td>
+<td style="text-align: center;">0.856</td>
+</tr>
+<tr class="even">
+<td>레이블 전파</td>
+<td style="text-align: center;">0.897</td>
+<td style="text-align: center;">0.886</td>
+<td style="text-align: center;"><strong>0.776</strong></td>
+</tr>
+<tr class="odd">
+<td>GCN</td>
+<td style="text-align: center;">0.919</td>
+<td style="text-align: center;"><strong>0.947</strong></td>
+<td style="text-align: center;">0.911</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>⚠️ k 하나로 레이블 전파는 0.12, GCN은 0.04가 움직였습니다. k를 적지 않은 결과는 재현할 수 없습니다 (🔗 <a href="../chapters/01_why_networks.html#c01-s3">01 §3</a>, 주제 ①)</li>
+</ul>
+<p><strong>✅ n은 무엇인가</strong> — PBMC 3k는 <strong>건강한 기증자 한 명</strong>의 세포입니다. 세포 2,638개로 잰 0.95는 “이 사람의 세포끼리”의 정확도이고, 새 기증자나 다른 batch에서도 유지되는지는 이 실험이 아무것도 말해주지 않습니다. 기증자 기준으로 n = 1입니다 (🔗 <a href="../chapters/09_training.html#c09-s1-3">09 §1</a>)</p>
+<ul>
+<li>💡 그래프가 쓸모없다는 결론이 아닙니다. 이 데이터에서 GCN은 두 baseline을 모두 이겼습니다. 다만 <strong>그 숫자가 무엇을 증명하는지</strong>는 라벨의 출처, 그래프의 k, n을 함께 봐야 정해집니다</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>🐍 실습 — PBMC 3k: 세포 kNN 그래프 → PyG → GCN, 그리고 baseline 둘
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Colab에서 실행합니다. <code>!pip install -q scanpy torch-geometric python-igraph leidenalg</code> 먼저 (<a href="../chapters/90_colab_setup.html">90. Colab 환경 설정</a>). 1–2분 걸립니다.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings<span class="op">;</span> warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, scanpy <span class="im">as</span> sc, torch, torch.nn.functional <span class="im">as</span> F</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> igraph <span class="im">as</span> ig, leidenalg <span class="im">as</span> la</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch_geometric.data <span class="im">import</span> Data</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch_geometric.nn <span class="im">import</span> GCNConv</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch_geometric.utils <span class="im">import</span> homophily</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> kneighbors_graph</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> balanced_accuracy_score <span class="im">as</span> bacc</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 1. PBMC 3k: 세포 2,638개, PCA 50차원, 세포유형 8개 ──────────────────</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>adata <span class="op">=</span> sc.datasets.pbmc3k_processed()</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> adata.obsm[<span class="st">"X_pca"</span>].astype(<span class="st">"float32"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.unique(adata.obs[<span class="st">"louvain"</span>].astype(<span class="bu">str</span>), return_inverse<span class="op">=</span><span class="va">True</span>)[<span class="dv">1</span>]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> knn_graph(k):                                    <span class="co"># ⚠️ k는 우리가 정하는 숫자</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> kneighbors_graph(Z, k, include_self<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> ((A <span class="op">+</span> A.T) <span class="op">&gt;</span> <span class="dv">0</span>).tocoo()                      <span class="co"># 대칭화</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> torch.tensor(np.vstack([A.row, A.col]), dtype<span class="op">=</span>torch.<span class="bu">long</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> (<span class="dv">5</span>, <span class="dv">15</span>, <span class="dv">50</span>):</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"k=</span><span class="sc">{</span>k<span class="sc">:2d}</span><span class="ss">  세포유형 homophily </span><span class="sc">{</span>homophily(knn_graph(k), torch.tensor(y))<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>ei <span class="op">=</span> knn_graph(<span class="dv">15</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> Data(x<span class="op">=</span>torch.tensor(Z), edge_index<span class="op">=</span>ei)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 2. 세포의 5%만 라벨을 안다고 하자 (유형마다 최소 1개) ────────────────</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> split(y, frac<span class="op">=</span><span class="fl">0.05</span>, seed<span class="op">=</span><span class="dv">0</span>):</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    rng <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    tr <span class="op">=</span> np.concatenate([rng.permutation(np.where(y <span class="op">==</span> c)[<span class="dv">0</span>])[:<span class="bu">max</span>(<span class="dv">1</span>, <span class="bu">round</span>(frac <span class="op">*</span> (y <span class="op">==</span> c).<span class="bu">sum</span>()))]</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>                         <span class="cf">for</span> c <span class="kw">in</span> np.unique(y)])</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    rest <span class="op">=</span> rng.permutation(np.setdiff1d(np.arange(<span class="bu">len</span>(y)), tr))</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tr, rest[:<span class="dv">263</span>], rest[<span class="dv">263</span>:]                <span class="co"># train / validation / test</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GCN(torch.nn.Module):</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, i, o, h<span class="op">=</span><span class="dv">64</span>):</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()<span class="op">;</span> <span class="va">self</span>.c1, <span class="va">self</span>.c2 <span class="op">=</span> GCNConv(i, h), GCNConv(h, o)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x, ei):</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> F.dropout(F.relu(<span class="va">self</span>.c1(F.dropout(x, <span class="fl">0.5</span>, <span class="va">self</span>.training), ei)), <span class="fl">0.5</span>, <span class="va">self</span>.training)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.c2(x, ei)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compare(y, seed<span class="op">=</span><span class="dv">0</span>):</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    tr, va, te <span class="op">=</span> split(y, seed<span class="op">=</span>seed)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> {}</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (a) 그래프 없이 PCA만</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    lr <span class="op">=</span> LogisticRegression(max_iter<span class="op">=</span><span class="dv">5000</span>).fit(Z[tr], y[tr])</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    out[<span class="st">"로지스틱 회귀 (PCA만)"</span>] <span class="op">=</span> bacc(y[te], lr.predict(Z[te]))</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (b) 특징 없이 그래프만: 06의 레이블 전파</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> torch.sparse_coo_tensor(ei, torch.ones(ei.shape[<span class="dv">1</span>]), (<span class="bu">len</span>(y), <span class="bu">len</span>(y)))</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    deg <span class="op">=</span> torch.sparse.<span class="bu">sum</span>(A, <span class="dv">1</span>).to_dense()</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    Y0 <span class="op">=</span> torch.zeros(<span class="bu">len</span>(y), y.<span class="bu">max</span>() <span class="op">+</span> <span class="dv">1</span>)<span class="op">;</span> Y0[tr, y[tr]] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    Y <span class="op">=</span> Y0.clone()</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">50</span>):</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>        Y <span class="op">=</span> <span class="fl">0.9</span> <span class="op">*</span> torch.sparse.mm(A, Y) <span class="op">/</span> deg[:, <span class="va">None</span>] <span class="op">+</span> <span class="fl">0.1</span> <span class="op">*</span> Y0</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    out[<span class="st">"레이블 전파 (그래프만)"</span>] <span class="op">=</span> bacc(y[te], Y.argmax(<span class="dv">1</span>).numpy()[te])</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (c) GCN: 둘 다</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    torch.manual_seed(seed)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> GCN(Z.shape[<span class="dv">1</span>], y.<span class="bu">max</span>() <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    opt <span class="op">=</span> torch.optim.Adam(m.parameters(), lr<span class="op">=</span><span class="fl">0.01</span>, weight_decay<span class="op">=</span><span class="fl">5e-4</span>)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    yt, best <span class="op">=</span> torch.tensor(y), (<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">200</span>):</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>        m.train()<span class="op">;</span> opt.zero_grad()</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>        F.cross_entropy(m(data.x, ei)[tr], yt[tr]).backward()<span class="op">;</span> opt.step()</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>        m.<span class="bu">eval</span>()</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>            p <span class="op">=</span> m(data.x, ei).argmax(<span class="dv">1</span>).numpy()</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> bacc(y[va], p[va]) <span class="op">&gt;</span> best[<span class="dv">0</span>]:</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>            best <span class="op">=</span> (bacc(y[va], p[va]), bacc(y[te], p[te]))</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>    out[<span class="st">"GCN (PCA + 그래프)"</span>] <span class="op">=</span> best[<span class="dv">1</span>]</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">세포유형 (학습 라벨 5%)"</span>)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, v <span class="kw">in</span> compare(y).items():</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>name<span class="sc">:16s}</span><span class="ss"> balanced accuracy </span><span class="sc">{</span>v<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 3. ⚠️ 라벨을 같은 그래프로 만들면 ────────────────────────────────────</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>e <span class="op">=</span> ei.t().numpy()<span class="op">;</span> e <span class="op">=</span> e[e[:, <span class="dv">0</span>] <span class="op">&lt;</span> e[:, <span class="dv">1</span>]]</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>y_graph <span class="op">=</span> np.array(la.find_partition(ig.Graph(n<span class="op">=</span><span class="bu">len</span>(Z), edges<span class="op">=</span>e.tolist()),</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>                                     la.RBConfigurationVertexPartition,</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>                                     resolution_parameter<span class="op">=</span><span class="fl">1.0</span>, seed<span class="op">=</span><span class="dv">0</span>).membership)</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">그래프로 만든 라벨 (</span><span class="sc">{</span>y_graph<span class="sc">.</span><span class="bu">max</span>() <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">개 군집, 생물학적 이름 없음)"</span>)</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, v <span class="kw">in</span> compare(y_graph).items():</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>name<span class="sc">:16s}</span><span class="ss"> balanced accuracy </span><span class="sc">{</span>v<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>확인할 것:</strong></p>
+<ul>
+<li>처음 세 줄: k를 5 → 15 → 50으로 키우면 homophily가 0.926 → 0.902 → 0.856으로 떨어집니다. 이웃을 넓게 잡을수록 다른 유형이 섞입니다</li>
+<li>세포유형(라벨 5%, 시드 0): 로지스틱 회귀 0.842, 레이블 전파 0.792, GCN 0.947</li>
+<li>그래프로 만든 라벨(6개 군집): 로지스틱 회귀 0.809, 레이블 전파 0.729, GCN <strong>0.955</strong> — 이름 없는 군집을 더 잘 맞힙니다</li>
+<li>이 실습의 레이블 전파는 α = 0.9로 고정했습니다(위 표는 validation으로 고름). 그래서 숫자가 조금 다릅니다. <code>0.9</code>를 0.5, 0.99로 바꿔 보세요</li>
+<li><code>split(y, seed=seed)</code>의 시드를 바꿔 보세요. 세 모델의 순서가 유지되나요?</li>
+</ul>
+</div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="요약" class="level2">
+<h2 class="anchored" data-anchor-id="요약">📝 요약</h2>
+<ul>
+<li>생물학의 그래프는 엣지의 출처가 제각각입니다 — 분자(정의된 결합) → 지식 그래프(DB가 모은 관계, 연구 편향) → 공간 전사체(거리와 반경) → 단일세포(우리가 정한 k). 아래로 갈수록 <strong>선택</strong>에 가깝습니다</li>
+<li>⚠️ 벤치마크들은 그래프·딥러닝 방법이 단순한 방법보다 <strong>일관되게</strong> 낫지는 않다고 보고합니다 (공간 군집화, 단일세포 foundation model, 교란 효과 예측)</li>
+<li>최근 흐름: 그래프 트랜스포머(라플라시안 고유벡터 위치 인코딩), 이종 그래프, 관계형 딥러닝, 지식 그래프 foundation model, LLM + 그래프, 그래프 생성 모델(자기회귀, 확산)</li>
+<li>⚠️ GNN 논문의 숫자는 <strong>그래프 없는 baseline, 그래프만 쓴 baseline, 그래프 구성(k·임계값·DB), n, split, 라벨의 출처</strong>와 함께 읽습니다</li>
+<li>PBMC 3k에서 GCN은 라벨 5%로 0.947 — 로지스틱 회귀(0.838)와 레이블 전파(0.886)를 모두 이겼습니다</li>
+<li>⚠️ 그러나 같은 그래프로 만든 <strong>이름 없는 군집</strong>은 0.961로 더 잘 맞혔습니다. 라벨이 그래프에서 나왔다면 정확도는 순환입니다</li>
+<li>⚠️ k만 바꿔도 레이블 전파는 0.12 움직였고, 기증자는 한 명(n = 1)이었습니다</li>
+<li>❌ “GNN을 썼다”는 성능의 근거가 아니고, 임베딩 그림은 측정이 아닙니다</li>
+</ul>
+<hr>
+</section>
+<section id="강의를-마치며" class="level2">
+<h2 class="anchored" data-anchor-id="강의를-마치며">🗺️ 강의를 마치며</h2>
+<p>Part 1을 관통한 질문은 이것이었습니다.</p>
+<blockquote class="blockquote">
+<p><strong>이 네트워크를 조금 다르게 만들었어도, 나는 같은 문장을 말할 수 있는가?</strong></p>
+</blockquote>
+<p>Part 2는 여기에 한 줄을 보탭니다.</p>
+<blockquote class="blockquote">
+<p><strong>이 모델을 같은 조건의 단순한 모델 옆에 놓아도, 나는 같은 문장을 말할 수 있는가?</strong></p>
+</blockquote>
+<ul>
+<li>08 — 신경망과 선형 모델의 차이는 활성함수 하나다</li>
+<li>09 — 누수 없이 나누고 같은 조건에서 비교해야 숫자가 된다. 누가 이길지는 재봐야 안다</li>
+<li>10 — 아키텍처는 가정이다. 가정이 데이터와 맞을 때만 이득이다</li>
+<li>11 — “비슷하다”의 정의가 임베딩을 정하고, 좌표에는 의미가 없다</li>
+<li>12 — GNN은 전파에 학습을 붙인 것이다. 이득의 대부분은 전파에서 오고, 이웃이 다르면 해가 된다</li>
+<li>13 — 논문의 숫자는 baseline·그래프 구성·n·라벨의 출처와 함께 읽는다</li>
+</ul>
+<p><strong>세 가지 주제, 다시</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 29%">
+<col style="width: 44%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>주제</th>
+<th>Part 1</th>
+<th>Part 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>① 엣지는 선택이었다</strong></td>
+<td>01 임계값 하나가 모듈을 바꿈</td>
+<td>11 p·q가 “이웃”의 반경을 바꿈 · 12 이웃이 다르면 GCN이 MLP보다 못함 · 13 kNN의 k</td>
+</tr>
+<tr class="even">
+<td><strong>② null 없이는 어떤 숫자도 의미가 없다</strong></td>
+<td>04 차수 보존 재배선</td>
+<td>08 ln 2 · 09 다수 클래스 0.20 · 12 특징만 쓴 로지스틱 0.605와 레이블 전파 0.709 · 13 그래프 없는 baseline</td>
+</tr>
+<tr class="odd">
+<td><strong>③ 그림은 측정이 아니다</strong></td>
+<td>07 레이아웃은 데이터가 아니다</td>
+<td>10 UMAP은 모두 깔끔했지만 수치는 달랐다 · 11 좌표는 시드마다 돈다 · 13 임베딩 그림은 근거가 아니다</td>
+</tr>
+</tbody>
+</table>
+<p>💡 방법은 앞으로도 계속 바뀝니다. 이 강의에서 다룬 모델 중 몇은 몇 년 뒤 교과서에서 빠질 것입니다. 그래도 위 두 질문과 세 가지 주제는 다음 방법에도 그대로 쓸 수 있습니다.</p>
+<hr>
+</section>
+<section id="더-읽을거리" class="level2">
+<h2 class="anchored" data-anchor-id="더-읽을거리">➕ 더 읽을거리</h2>
+<section id="생물의학-응용" class="level3">
+<h3 class="anchored" data-anchor-id="생물의학-응용">생물의학 응용</h3>
+<p>Li MM, Huang K, Zitnik M. <a href="https://doi.org/10.1038/s41551-022-00942-x"><em>Graph representation learning in biomedicine and healthcare.</em></a> Nat Biomed Eng. 2022.<br>
+Zitnik M, et al.&nbsp;<a href="https://doi.org/10.1093/bioadv/vbae099"><em>Current and future directions in network biology.</em></a> Bioinform Adv. 2024.<br>
+Yang K, et al.&nbsp;<a href="https://doi.org/10.1021/acs.jcim.9b00237"><em>Analyzing learned molecular representations for property prediction.</em></a> J Chem Inf Model. 2019.<br>
+Stokes JM, et al.&nbsp;<a href="https://doi.org/10.1016/j.cell.2020.01.021"><em>A deep learning approach to antibiotic discovery.</em></a> Cell. 2020.<br>
+Zitnik M, Agrawal M, Leskovec J. <a href="https://doi.org/10.1093/bioinformatics/bty294"><em>Modeling polypharmacy side effects with graph convolutional networks.</em></a> Bioinformatics. 2018. (Decagon)<br>
+Huang K, et al.&nbsp;<a href="https://doi.org/10.1038/s41591-024-03233-x"><em>A foundation model for clinician-centered drug repurposing.</em></a> Nat Med. 2024. (TxGNN)<br>
+Chandak P, Huang K, Zitnik M. <a href="https://doi.org/10.1038/s41597-023-01960-3"><em>Building a knowledge graph to enable precision medicine.</em></a> Sci Data. 2023. (PrimeKG)<br>
+Dong K, Zhang S. <a href="https://doi.org/10.1038/s41467-022-29439-6"><em>Deciphering spatial domains from spatially resolved transcriptomics with an adaptive graph attention auto-encoder.</em></a> Nat Commun. 2022. (STAGATE)<br>
+Long Y, et al.&nbsp;<a href="https://doi.org/10.1038/s41467-023-36796-3"><em>Spatially informed clustering, integration, and deconvolution of spatial transcriptomics with GraphST.</em></a> Nat Commun. 2023.<br>
+Wang J, et al.&nbsp;<a href="https://doi.org/10.1038/s41467-021-22197-x"><em>scGNN is a novel graph neural network framework for single-cell RNA-Seq analyses.</em></a> Nat Commun. 2021.</p>
+</section>
+<section id="벤치마크-단순한-방법과의-비교" class="level3">
+<h3 class="anchored" data-anchor-id="벤치마크-단순한-방법과의-비교">벤치마크 — 단순한 방법과의 비교</h3>
+<p>Cheng A, et al.&nbsp;<a href="https://doi.org/10.1093/bib/bbac475"><em>Benchmarking cell-type clustering methods for spatially resolved transcriptomics data.</em></a> Brief Bioinform. 2023.<br>
+Hu Y, et al.&nbsp;<a href="https://doi.org/10.1186/s13059-024-03361-0"><em>Benchmarking clustering, alignment, and integration methods for spatial transcriptomics.</em></a> Genome Biol. 2024.<br>
+Kang L, et al.&nbsp;<a href="https://doi.org/10.1093/nar/gkaf303"><em>Benchmarking computational methods for detecting spatial domains and domain-specific spatially variable genes from spatial transcriptomics data.</em></a> Nucleic Acids Res. 2025.<br>
+Theodoris CV, et al.&nbsp;<a href="https://doi.org/10.1038/s41586-023-06139-9"><em>Transfer learning enables predictions in network biology.</em></a> Nature. 2023. (Geneformer)<br>
+Cui H, et al.&nbsp;<a href="https://doi.org/10.1038/s41592-024-02201-0"><em>scGPT: toward building a foundation model for single-cell multi-omics using generative AI.</em></a> Nat Methods. 2024.<br>
+Kedzierska KZ, et al.&nbsp;<a href="https://doi.org/10.1186/s13059-025-03574-x"><em>Zero-shot evaluation reveals limitations of single-cell foundation models.</em></a> Genome Biol. 2025.<br>
+Ahlmann-Eltze C, Huber W, Anders S. <a href="https://doi.org/10.1038/s41592-025-02772-6"><em>Deep-learning-based gene perturbation effect prediction does not yet outperform simple linear baselines.</em></a> Nat Methods. 2025.</p>
+</section>
+<section id="최근-흐름" class="level3">
+<h3 class="anchored" data-anchor-id="최근-흐름">최근 흐름</h3>
+<p>Stanford <a href="https://web.stanford.edu/class/cs224w/">CS224W: Machine Learning with Graphs</a> (2025년 가을 강의 목록)<br>
+Dwivedi VP, Bresson X. <a href="https://arxiv.org/abs/2012.09699"><em>A generalization of transformer networks to graphs.</em></a> AAAI Workshop on Deep Learning on Graphs. 2021.<br>
+Ying C, et al.&nbsp;<a href="https://proceedings.neurips.cc/paper/2021/hash/f1c1592588411002af340cbaedd6fc33-Abstract.html"><em>Do transformers really perform badly for graph representation?</em></a> NeurIPS. 2021. (Graphormer)<br>
+Rampášek L, et al.&nbsp;<a href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/5d4834a159f1547b267a05a4e2b7cf5e-Abstract-Conference.html"><em>Recipe for a general, powerful, scalable graph transformer.</em></a> NeurIPS. 2022. (GraphGPS)<br>
+Schlichtkrull M, et al.&nbsp;<a href="https://doi.org/10.1007/978-3-319-93417-4_38"><em>Modeling relational data with graph convolutional networks.</em></a> ESWC. 2018. (R-GCN)<br>
+Fey M, et al.&nbsp;<a href="https://proceedings.mlr.press/v235/fey24a.html"><em>Position: relational deep learning — graph representation learning on relational databases.</em></a> ICML. 2024.<br>
+Robinson J, et al.&nbsp;<a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/25cd345233c65fac1fec0ce61d0f7836-Abstract-Datasets_and_Benchmarks_Track.html"><em>RelBench: a benchmark for deep learning on relational databases.</em></a> NeurIPS Datasets and Benchmarks. 2024.<br>
+Galkin M, et al.&nbsp;<a href="https://arxiv.org/abs/2310.04562"><em>Towards foundation models for knowledge graph reasoning.</em></a> ICLR. 2024. (ULTRA)<br>
+Jin B, et al.&nbsp;<a href="https://doi.org/10.1109/TKDE.2024.3469578"><em>Large language models on graphs: a comprehensive survey.</em></a> IEEE TKDE. 2024.<br>
+Liu J, et al.&nbsp;<a href="https://doi.org/10.1109/TPAMI.2025.3548729"><em>Graph foundation models: concepts, opportunities and challenges.</em></a> IEEE TPAMI. 2025.</p>
+</section>
+<section id="생성-모델" class="level3">
+<h3 class="anchored" data-anchor-id="생성-모델">생성 모델</h3>
+<p>You J, et al.&nbsp;<a href="https://proceedings.mlr.press/v80/you18a.html"><em>GraphRNN: generating realistic graphs with deep auto-regressive models.</em></a> ICML. 2018.<br>
+Vignac C, et al.&nbsp;<a href="https://openreview.net/forum?id=UaAD-Nu86WX"><em>DiGress: discrete denoising diffusion for graph generation.</em></a> ICLR. 2023.<br>
+Hoogeboom E, et al.&nbsp;<a href="https://proceedings.mlr.press/v162/hoogeboom22a.html"><em>Equivariant diffusion for molecule generation in 3D.</em></a> ICML. 2022.<br>
+Watson JL, et al.&nbsp;<a href="https://doi.org/10.1038/s41586-023-06415-8"><em>De novo design of protein structure and function with RFdiffusion.</em></a> Nature. 2023.</p>
+</section>
+<section id="평가와-재현성" class="level3">
+<h3 class="anchored" data-anchor-id="평가와-재현성">평가와 재현성</h3>
+<p>Errica F, Podda M, Bacciu D, Micheli A. <a href="https://arxiv.org/abs/1912.09893"><em>A fair comparison of graph neural networks for graph classification.</em></a> ICLR. 2020.<br>
+Kapoor S, Narayanan A. <a href="https://doi.org/10.1016/j.patter.2023.100804"><em>Leakage and the reproducibility crisis in machine-learning-based science.</em></a> Patterns. 2023.<br>
+Squair JW, et al.&nbsp;<a href="https://doi.org/10.1038/s41467-021-25960-2"><em>Confronting false discoveries in single-cell differential expression.</em></a> Nat Commun. 2021.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<!-- AI Chat Widget 초기화 -->
+
+<!-- _quarto.yml의 include-after-body에 등록되어 모든 페이지에 자동 삽입됩니다 -->
+
+<script>
+
+  // ★ Cloudflare Worker 배포 후 URL로 교체하세요
+
+  const WORKER_URL = "https://falling-wave-447f.eh0129s.workers.dev/";
+
+
+
+  // 각 .qmd 파일의 YAML에서 ai-context를 읽어옵니다
+
+  // (없으면 빈 문자열 → 기본 안내 메시지)
+
+  const metaContext = document.querySelector('meta[name="ai-context"]');
+
+  const metaTitle   = document.querySelector('meta[name="ai-title"]') || { content: document.title };
+
+
+
+  window.AI_CHAT_CONFIG = {
+
+    workerUrl:      WORKER_URL,
+
+    chapterContext: metaContext ? metaContext.content : "",
+
+    chapterTitle:   metaTitle  ? metaTitle.content   : document.title,
+
+  };
+
+
+
+  // ai-chat.js 는 assets/ 에 둡니다.
+
+  // ⚠️ _extensions/ 처럼 밑줄로 시작하는 폴더는 Quarto가 _site/ 로 복사하지 않아서
+
+  //    빌드된 사이트에서 404가 납니다. assets/ 는 그대로 복사됩니다.
+
+  // 경로는 quarto:offset 메타로 사이트 루트를 찾아 붙입니다
+
+  // (고정 "../assets/..." 로 쓰면 루트의 index.html 에서 깨집니다).
+
+  (function () {
+
+    var offsetMeta = document.querySelector('meta[name="quarto:offset"]');
+
+    var root = offsetMeta ? offsetMeta.content : "./";
+
+    if (root && !root.endsWith("/")) root += "/";
+
+    var s = document.createElement("script");
+
+    s.src = root + "assets/ai-chat.js";
+
+    s.defer = true;
+
+    document.body.appendChild(s);
+
+  })();
+
+</script>
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation column-body">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/12_gnn.html" class="pagination-link" aria-label="12. 그래프 신경망">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">12. 그래프 신경망</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/90_colab_setup.html" class="pagination-link" aria-label="90. Colab 환경 설정">
+        <span class="nav-page-text">90. Colab 환경 설정</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Copyright 2026, Eunji</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

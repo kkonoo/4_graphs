@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Eunji Ha">
+<meta name="dcterms.date" content="2026-09-21">
+
+<title>네트워크와 딥러닝 – 4. 네트워크와 딥러닝</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./chapters/01_why_networks.html" rel="next">
+<link href="./images/logo.ico/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-7f128302b46659ec05c1cdf12d27b5f1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<meta name="ai-title" content="홈 - 강의 안내">
+<meta name="ai-context" content="
+이 강의는 습식실험 경험은 있지만 계산 분석 경험은 거의 없는 대학원생을
+위한 과정입니다. 두 파트로 구성됩니다.
+Part 1 네트워크와 그래프 이론(7챕터): 왜 네트워크인가, 그래프의 표현,
+네트워크 정량화와 중심성, 랜덤 그래프와 null model, 커뮤니티와 모듈,
+전파와 예측, 실무(데이터·편향·시각화). networkx와 igraph를 씁니다.
+Part 2 신경망과 그래프 학습(6챕터): 회귀에서 신경망으로, 학습의 실제,
+주요 아키텍처, 그래프 임베딩, 그래프 신경망(GNN), 최근 흐름.
+PyTorch와 PyTorch Geometric을 데모 수준으로 다룹니다.
+실습은 모두 Google Colab에서 실행하며 각 챕터 끝의 접힌 블록에 있습니다.
+강의를 관통하는 세 가지 주제는 (1) 엣지는 우리의 선택이었다
+(2) null model 없이는 어떤 네트워크 지표도 해석할 수 없다
+(3) 그림은 측정이 아니다 입니다.
+">
+
+
+<link rel="stylesheet" href="assets/html.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">4. 네트워크와 딥러닝</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/kkonoo/4_graphs"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Home</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Home</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 1. 네트워크와 그래프 이론</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/01_why_networks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">01. 왜 네트워크인가</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/02_representation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">02. 그래프의 표현</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/03_metrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">03. 네트워크 정량화와 중심성</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/04_random_null.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04. 랜덤 그래프와 null model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/05_community.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">05. 커뮤니티와 모듈</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/06_propagation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">06. 전파와 예측</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/07_practice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07. 실무 — 데이터·편향·시각화</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 2. 신경망과 그래프 학습</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/08_nn_basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">08. 회귀에서 신경망으로</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/09_training.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09. 학습의 실제</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/10_architectures.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10. 알아둘 만한 아키텍처</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/11_node_embedding.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11. 그래프 임베딩</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/12_gnn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12. 그래프 신경망</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/13_frontiers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13. 최근 흐름과 논문 읽는 눈</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">부록</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/90_colab_setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">90. Colab 환경 설정</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/91_glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">91. 용어집</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#강의-개요" id="toc-강의-개요" class="nav-link active" data-scroll-target="#강의-개요">📖 강의 개요</a></li>
+  <li><a href="#강의-목차" id="toc-강의-목차" class="nav-link" data-scroll-target="#강의-목차">🗓️ 강의 목차</a>
+  <ul>
+  <li><a href="#part-1-네트워크와-그래프-이론" id="toc-part-1-네트워크와-그래프-이론" class="nav-link" data-scroll-target="#part-1-네트워크와-그래프-이론">Part 1 · 네트워크와 그래프 이론</a></li>
+  <li><a href="#part-2-신경망과-그래프-학습" id="toc-part-2-신경망과-그래프-학습" class="nav-link" data-scroll-target="#part-2-신경망과-그래프-학습">Part 2 · 신경망과 그래프 학습</a></li>
+  </ul></li>
+  <li><a href="#강의-전체를-관통하는-세-가지" id="toc-강의-전체를-관통하는-세-가지" class="nav-link" data-scroll-target="#강의-전체를-관통하는-세-가지">🧵 강의 전체를 관통하는 세 가지</a></li>
+  <li><a href="#두-파트는-어떻게-이어지는가" id="toc-두-파트는-어떻게-이어지는가" class="nav-link" data-scroll-target="#두-파트는-어떻게-이어지는가">🔗 두 파트는 어떻게 이어지는가</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-body" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">네트워크와 딥러닝</h1>
+<p class="subtitle lead">생물의학 데이터를 위한 그래프 이론과 신경망</p>
+</div>
+
+
+
+<div class="quarto-title-meta column-body">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Eunji Ha </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 21, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="강의-개요" class="level2">
+<h2 class="anchored" data-anchor-id="강의-개요">📖 강의 개요</h2>
+<p>이 강의는 <strong>습식실험(wet lab) 경험은 있지만 계산 분석 경험은 거의 없거나 전혀 없는 대학원생</strong>을 위해 만들었습니다. 오믹스 데이터를 다뤄본 적이 있고, 점과 선이 얽힌 그림을 한 번쯤 받아본 적이 있다고 가정합니다.</p>
+<p>두 파트로 나뉘며, 각각 다른 질문에 답합니다.</p>
+<blockquote class="blockquote">
+<p><strong>Part 1 — 네트워크는 실제로 무엇을 말하는가?</strong><br>
+<strong>Part 2 — 거기서 모델이 배우게 하면 무슨 일이 일어나는가?</strong></p>
+</blockquote>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<section id="이-강의에서-배우는-것" class="level3 quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<h3 class="anchored" data-anchor-id="이-강의에서-배우는-것">이 강의에서 배우는 것</h3>
+<p>✅ 이번 주에 바로 자기 데이터에 써먹을 수 있는 개념<br>
+✅ Colab에서 돌아가는 Python — 모든 챕터에 선택 실습으로 포함<br>
+✅ 네트워크·GNN 그림을 읽고 <strong>의심할</strong> 수 있는 어휘</p>
+</section>
+<section id="이-강의가-아닌-것" class="level3 quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<h3 class="anchored" data-anchor-id="이-강의가-아닌-것">이 강의가 아닌 것</h3>
+<p>❌ 수학 강의. 선형대수는 설명에 필요한 만큼만 나옵니다<br>
+❌ 딥러닝 엔지니어링 강의. Part 2는 이해까지이고 배포까지 가지 않습니다</p>
+</section>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>🐍 실습에 대하여
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>모든 챕터 끝에 접힌 <strong>🐍 실습</strong> 블록이 있습니다.</p>
+<ul>
+<li>하나도 펼치지 않고 강의 전체를 읽어도 됩니다</li>
+<li>전부 <strong>Google Colab</strong>에서 돌아가며 설치할 것이 없습니다 → <a href="./chapters/90_colab_setup.html">90. Colab 환경 설정</a></li>
+<li>Part 1은 <code>networkx</code>·<code>igraph</code>, Part 2는 <code>PyTorch</code>·<code>PyTorch Geometric</code>을 씁니다</li>
+</ul>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="강의-목차" class="level2">
+<h2 class="anchored" data-anchor-id="강의-목차">🗓️ 강의 목차</h2>
+<p>각 챕터는 실제로 받을 법한 질문으로 시작해서, 기억할 만한 한 가지로 끝납니다.</p>
+<section id="part-1-네트워크와-그래프-이론" class="level3">
+<h3 class="anchored" data-anchor-id="part-1-네트워크와-그래프-이론">Part 1 · 네트워크와 그래프 이론</h3>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>01 · 왜 네트워크인가
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>발현 행렬은 표입니다. 네트워크로 바꾸면 무엇을 얻고 무엇을 가정하나요?</strong></p>
+</blockquote>
+<ol type="1">
+<li>네트워크와 그래프 🕸️ — 그래프가 일부러 버리는 것; 자연 그래프와 정보 그래프</li>
+<li>생물학 데이터는 언제 그래프가 되는가 🧬 — 측정된 엣지와 우리가 만든 엣지</li>
+<li>⚠️ 임계값이 곧 분석이다 — 숫자 하나가 네트워크를, 그리고 그 위의 모든 결과를 바꾼다</li>
+<li>네 가지 질문 🗺️ — 노드 분류, 링크 예측, 커뮤니티 검출, 네트워크 비교</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — <code>scanpy</code>와 Seurat은 그래프의 <em>k</em>를 대신 정해줍니다(15, 20). 대부분의 단일세포 클러스터는 아무도 설정하지 않은 숫자 위에 서 있습니다.</p>
+<p>➡️ <a href="./chapters/01_why_networks.html">01 읽기</a></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>02 · 그래프의 표현
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>유전자 2만 개 네트워크를 밀집 행렬로 만들면 메모리가 얼마나 필요할까요?</strong></p>
+</blockquote>
+<ol type="1">
+<li>그래프의 종류 🧩 — 무방향/방향, 가중, 부호, 이분, 다중; 사영(projection)의 함정</li>
+<li>표현 3종 📦 — 인접 행렬 / 엣지 목록 / 인접 리스트, 그리고 sparsity</li>
+<li>연결성 🔗 — 연결 요소, bridge, 절단점, 방향 그래프의 SCC</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — 이분 그래프를 사영하면 구성원이 많은 경로 하나가 거대한 clique을 만들어 네트워크를 지배합니다.</p>
+<p>➡️ <a href="./chapters/02_representation.html">02 읽기</a></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>03 · 네트워크 정량화와 중심성
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>“TP53은 이 네트워크의 hub 유전자다”라고 쓸 때, 어느 지표로 hub인가요?</strong></p>
+</blockquote>
+<ol type="1">
+<li>차수 분포 📊 — log-log로 봐야 하는 이유; ⚠️ scale-free 서사의 한계</li>
+<li>거리와 뭉침 📏 — 최단경로·지름·평균 경로 길이, 뭉침 계수, small-world</li>
+<li>중심성 🎯 — 차수·매개·근접·고유벡터·PageRank, 그리고 hub과 bottleneck의 차이</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — 평균 뭉침 계수와 transitivity는 다른 값입니다(karate club에서 0.571 vs 0.256). 중심성은 지표마다 1위가 바뀝니다.</p>
+<p>➡️ <a href="./chapters/03_metrics.html">03 읽기</a></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>04 · 랜덤 그래프와 null model
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>내 네트워크의 뭉침 계수가 0.57입니다. 큰 값인가요?</strong></p>
+</blockquote>
+<ol type="1">
+<li>세 가지 생성 모델 🎲 — ER·WS·BA가 각각 무엇을 재현하고 무엇을 못 하는가</li>
+<li>⚠️ null model이 핵심이다 — 차수 보존 재배선, Z-score, 경험적 p-value</li>
+<li>모티프와 그 유의성 🔺 — FFL과 되먹임, graphlet, structural role</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — 같은 네트워크에서 평균 뭉침 계수는 Z=4.4로 유의한데 삼각형 수는 Z=1.2로 유의하지 않습니다. 지표 선택이 곧 결론입니다.</p>
+<p>➡️ <a href="./chapters/04_random_null.html">04 읽기</a></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>05 · 커뮤니티와 모듈
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong><code>resolution=1.0</code>이면 클러스터 12개, <code>0.5</code>면 8개. 어느 쪽이 맞나요?</strong></p>
+</blockquote>
+<ol type="1">
+<li>모듈성 Q 🧱 — 04의 null model이 다시 등장하는 자리</li>
+<li>알고리즘 계보 🧬 — Girvan-Newman → Louvain → Leiden, 정답을 아는 그래프에서 비교</li>
+<li>⚠️ resolution은 답이 없다 — 클러스터 수를 정하는 파라미터, 그리고 resolution limit</li>
+<li>스펙트럴 방법 🎼 — 라플라시안 고유값과 피들러 벡터</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — 클리크 40개를 고리로 이으면, 정답(Q=0.884)보다 이웃끼리 합쳐버린 답(Q=0.903)의 점수가 더 높습니다. 알고리즘의 결함이 아니라 Q의 성질입니다.</p>
+<p>➡️ <a href="./chapters/05_community.html">05 읽기</a></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>06 · 전파와 예측
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>GWAS 후보 영역 30개 안에 유전자가 400개. 어느 것부터 실험하시겠습니까?</strong></p>
+</blockquote>
+<ol type="1">
+<li>guilt-by-association 🤝 — 이웃은 서로 비슷하다는 가정, 그리고 그것이 깨질 때</li>
+<li>네트워크 전파 🌊 — 재시작 랜덤워크로 질병 유전자 우선순위</li>
+<li>링크 예측 🔮 — heuristic 네 가지와 ⚠️ 평가의 함정</li>
+<li>확산 모델 🦠 — SIR, 개입 전략, 영향력 최대화</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — 링크 예측에서 음성 샘플을 현실 비율로 뽑으면 AUROC는 0.71로 그대로인데 AUPRC는 0.72에서 0.20으로 무너집니다.</p>
+<p>➡️ <a href="./chapters/06_propagation.html">06 읽기</a></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>07 · 실무 — 데이터·편향·시각화
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>TP53이 PPI 네트워크의 최상위 허브입니다. 생물학인가요, 논문 수인가요?</strong></p>
+</blockquote>
+<ol type="1">
+<li>네트워크는 어디서 오는가 🗄️ — STRING·BioGRID·Reactome·OmniPath, 그리고 채널 필터</li>
+<li>⚠️ 무엇이 왜곡되어 있는가 — 연구 편향, 불완전성, 조직·조건 무시</li>
+<li>시각화와 재현성 🎨 — 레이아웃은 데이터가 아니다; Cytoscape로 넘기기; methods 체크리스트</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — 허브가 하나도 없는 네트워크라도, 연구량에 비례해 엣지가 발견된다는 규칙 하나만 넣으면 허브가 생깁니다.</p>
+<p>➡️ <a href="./chapters/07_practice.html">07 읽기</a></p>
+</div>
+</div>
+</div>
+</section>
+<section id="part-2-신경망과-그래프-학습" class="level3">
+<h3 class="anchored" data-anchor-id="part-2-신경망과-그래프-학습">Part 2 · 신경망과 그래프 학습</h3>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>08 · 회귀에서 신경망으로
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>로지스틱 회귀는 써봤습니다. 신경망은 그걸 여러 층 쌓은 것뿐인가요?</strong></p>
+</blockquote>
+<ol type="1">
+<li>회귀에서 뉴런으로 🧮 — 로지스틱 회귀는 이미 뉴런 하나; ⚠️ 활성함수 없이 쌓으면 여전히 선형; XOR</li>
+<li>활성함수와 손실 ⚡ — ReLU·sigmoid·softmax, 기울기 소실 실측, MSE vs cross-entropy</li>
+<li>경사하강법과 역전파 ⛰️ — 학습률, 연쇄법칙 손 계산, 시드와 초기화</li>
+<li>층을 쌓으면 무엇이 바뀌나 📊 — 결정경계, 보편 근사 정리가 말해주지 않는 것</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — 은닉 뉴런 2개면 XOR을 표현할 수 있지만, ReLU로는 시드 100개 중 18개만 실제로 풉니다. <code>CrossEntropyLoss</code> 앞에 softmax를 또 씌우면 에러 없이 loss가 0.55 밑으로 내려가지 않습니다.</p>
+<p>➡️ <a href="./chapters/08_nn_basics.html">08 읽기</a></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>09 · 학습의 실제
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>RNA-seq 샘플이 200개입니다. 딥러닝이 로지스틱 회귀보다 나을까요? 그걸 어떻게 확인하죠?</strong></p>
+</blockquote>
+<ol type="1">
+<li>데이터를 나누는 법 ✂️ — train·validation·test, ⚠️ 특징 선택 누수, 무엇을 n으로 셀 것인가</li>
+<li>과적합과 정규화 🎛️ — p ≫ n, 학습 곡선과 early stopping, dropout·weight decay·AdamW</li>
+<li>⚠️ 정직한 비교 ⚖️ — TCGA 유방암에서 elastic net·랜덤 포레스트·MLP를 같은 조건으로</li>
+<li>⚠️ batch와 지름길 🧪 — 라벨과 섞인 batch는 어떤 모델이든 지름길로 쓴다</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — 라벨이 무작위인데도 유전자를 먼저 고른 뒤 CV하면 정확도 0.77이 나옵니다 (CV 안에서 고르면 0.51).</p>
+<p>➡️ <a href="./chapters/09_training.html">09 읽기</a></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>10 · 알아둘 만한 아키텍처
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>methods에 “CNN 기반”, “VAE 기반”, “트랜스포머 기반”이라고 적혀 있습니다. 이름 말고 무엇을 확인해야 하나요?</strong></p>
+</blockquote>
+<ol type="1">
+<li>CNN — 서열 위를 미끄러지는 모티프 스캐너 🔍 — 지역성·가중치 공유 = 학습되는 PWM; ⚠️ 가정이 틀리면 손해; RNN은 짧게</li>
+<li>오토인코더와 VAE 🗜️ — 선형 오토인코더 = PCA, VAE와 scVI; ⚠️ 잠재 공간은 UMAP이 아니라 숫자로 비교</li>
+<li>어텐션 👀 — 입력마다 새로 정하는 가중 평균, 완전 그래프 위의 메시지 전달; ⚠️ 어텐션 가중치는 설명이 아니다</li>
+<li>정리 🧭 — 이름 대신 가정(귀납 편향)을 읽는다</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — 모티프 위치가 무작위인 합성 DNA에서 MLP는 학습 서열 10,000개로도 정확도 0.50에 머뭅니다(CNN 0.81). 반대로 위치가 늘 같으면 MLP가 CNN을 이깁니다(0.96 vs 0.81). PBMC 3k에서는 PCA가 비선형 오토인코더보다 모든 지표에서 같거나 나았습니다.</p>
+<p>➡️ <a href="./chapters/10_architectures.html">10 읽기</a></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>11 · 그래프 임베딩
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>유전자 2만 개를 각각 128차원 벡터로 바꿨습니다. TP53 벡터의 12번째 숫자는 무엇을 뜻할까요?</strong></p>
+</blockquote>
+<ol type="1">
+<li>노드를 벡터로 🪢 — encoder–decoder, ⚠️ “비슷하다”의 정의가 전부</li>
+<li>DeepWalk와 node2vec 🚶 — 랜덤워크를 문장으로; p·q가 걸음을 바꾼다; ⚠️ 교과서적 해석은 재현되지 않았다</li>
+<li>임베딩은 행렬 분해다 🧮 — 05의 스펙트럴 방법과 같은 가족; ⚠️ 좌표에는 의미가 없다</li>
+<li>얕은 임베딩의 한계 → GNN 🚧 — transductive, 노드 특징 못 씀, 파라미터가 노드 수에 비례</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — 시드만 바꿔 DeepWalk를 다시 돌리면 같은 번호 좌표끼리의 상관은 0.14뿐이지만, 노드 쌍 유사도끼리의 상관은 0.83입니다. 좌표가 아니라 관계를 보고하세요.</p>
+<p>➡️ <a href="./chapters/11_node_embedding.html">11 읽기</a></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>12 · 그래프 신경망
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>PPI 네트워크 위 GNN의 성능이 좋았습니다. 그중 얼마가 그래프 덕분이고, 얼마가 신경망 덕분일까요?</strong></p>
+</blockquote>
+<ol type="1">
+<li>메시지 전달 📨 — 왜 CNN을 그래프에 못 쓰나; aggregate + update; 06의 RWR에 학습되는 W를 끼우면 GCN</li>
+<li>GCN · GraphSAGE · GAT 🧩 — 이웃을 모으는 방식의 차이; Cora에서 특징만·그래프만 쓴 baseline과 같은 split으로 비교</li>
+<li>⚠️ GNN이 잘 못하는 것 🚧 — 과평활화, 과압축, homophily가 깨질 때, 1-WL 검정의 한계</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — Cora에서 GCN 이득의 93%는 학습되는 W가 하나뿐인 “특징 전파 + 로지스틱 회귀”로도 얻었습니다(0.805 vs 0.819). 엣지를 다른 분야끼리로 바꿔 homophily가 0.49까지 내려가면 GCN은 그래프를 쓰지 않는 MLP보다 못해집니다.</p>
+<p>➡️ <a href="./chapters/12_gnn.html">12 읽기</a></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>13 · 최근 흐름과 논문 읽는 눈
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p><strong>“GNN으로 세포유형을 95% 정확도로 분류했다”는 원고를 받았습니다. 무엇부터 물어보시겠습니까?</strong></p>
+</blockquote>
+<ol type="1">
+<li>생물학에서 그래프는 어디서 오나 🧬 — 분자·지식 그래프·공간 전사체·단일세포, 엣지의 출처가 곧 신뢰도; ⚠️ 벤치마크는 뭐라고 하나</li>
+<li>최근 흐름 🔭 — 그래프 트랜스포머, 이종 그래프, 관계형 딥러닝, 지식 그래프 foundation model, LLM + 그래프, 생성 모델</li>
+<li>⚠️ 논문 읽는 눈 🧐 — baseline·그래프 구성·n·split·라벨 출처 체크리스트; PBMC 3k에서 직접 재보기</li>
+<li>🗺️ 강의를 마치며 — 세 가지 주제 다시</li>
+</ol>
+<p>⚠️ <strong>함정</strong> — PBMC 3k의 kNN 그래프 위에서 GCN이 세포유형 라벨을 예측한 balanced accuracy는 0.947이었습니다. 같은 그래프를 Leiden으로 나눈 <strong>이름 없는 군집을 라벨로 삼아 GCN을 학습·평가하면</strong> 0.961로 더 높았습니다. 두 점수 모두 GCN의 예측 성능이며, 라벨이 그래프에서 나왔다면 높은 정확도는 순환적 평가의 결과일 수 있습니다.</p>
+<p>➡️ <a href="./chapters/13_frontiers.html">13 읽기</a></p>
+</div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="강의-전체를-관통하는-세-가지" class="level2">
+<h2 class="anchored" data-anchor-id="강의-전체를-관통하는-세-가지">🧵 강의 전체를 관통하는 세 가지</h2>
+<p>방법이 무엇이든 같은 세 가지 실패가 반복됩니다. 매 챕터에서 확인하세요.</p>
+<ul>
+<li><strong>① 엣지는 선택이었다</strong> — 임계값, <em>k</em>, β, DB 버전. 모든 결과가 이것을 물려받습니다 (01, 02, 07)</li>
+<li><strong>② null 없이는 어떤 숫자도 의미가 없다</strong> — 허브, 모듈, 모티프, 예측된 링크 모두 비교 모형이 필요합니다 (04, 05, 06)</li>
+<li><strong>③ 그림은 측정이 아니다</strong> — 네트워크 레이아웃, UMAP, 예쁜 GNN 임베딩. 어느 것도 근거가 아닙니다 (01, 07, 10, 13)</li>
+</ul>
+<hr>
+</section>
+<section id="두-파트는-어떻게-이어지는가" class="level2">
+<h2 class="anchored" data-anchor-id="두-파트는-어떻게-이어지는가">🔗 두 파트는 어떻게 이어지는가</h2>
+<p>Part 2는 새로 시작하는 것이 아닙니다. 두 아이디어가 그대로 넘어갑니다.</p>
+<ul>
+<li>05 §4 <strong>스펙트럴 클러스터링</strong> → 11, 노드 임베딩이 사실은 행렬 분해임이 드러나는 자리</li>
+<li>06 §2 <strong>네트워크 전파</strong> → 12, 메시지 전달이 같은 연산에 가중치를 학습시킨 것임을 보는 자리</li>
+</ul>
+<p>💡 한 파트만 가져간다면 Part 1을 가져가세요. 다음 달에 쓰게 될 쪽입니다.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<!-- AI Chat Widget 초기화 -->
+
+<!-- _quarto.yml의 include-after-body에 등록되어 모든 페이지에 자동 삽입됩니다 -->
+
+<script>
+
+  // ★ Cloudflare Worker 배포 후 URL로 교체하세요
+
+  const WORKER_URL = "https://falling-wave-447f.eh0129s.workers.dev/";
+
+
+
+  // 각 .qmd 파일의 YAML에서 ai-context를 읽어옵니다
+
+  // (없으면 빈 문자열 → 기본 안내 메시지)
+
+  const metaContext = document.querySelector('meta[name="ai-context"]');
+
+  const metaTitle   = document.querySelector('meta[name="ai-title"]') || { content: document.title };
+
+
+
+  window.AI_CHAT_CONFIG = {
+
+    workerUrl:      WORKER_URL,
+
+    chapterContext: metaContext ? metaContext.content : "",
+
+    chapterTitle:   metaTitle  ? metaTitle.content   : document.title,
+
+  };
+
+
+
+  // ai-chat.js 는 assets/ 에 둡니다.
+
+  // ⚠️ _extensions/ 처럼 밑줄로 시작하는 폴더는 Quarto가 _site/ 로 복사하지 않아서
+
+  //    빌드된 사이트에서 404가 납니다. assets/ 는 그대로 복사됩니다.
+
+  // 경로는 quarto:offset 메타로 사이트 루트를 찾아 붙입니다
+
+  // (고정 "../assets/..." 로 쓰면 루트의 index.html 에서 깨집니다).
+
+  (function () {
+
+    var offsetMeta = document.querySelector('meta[name="quarto:offset"]');
+
+    var root = offsetMeta ? offsetMeta.content : "./";
+
+    if (root && !root.endsWith("/")) root += "/";
+
+    var s = document.createElement("script");
+
+    s.src = root + "assets/ai-chat.js";
+
+    s.defer = true;
+
+    document.body.appendChild(s);
+
+  })();
+
+</script>
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation column-body">
+  <div class="nav-page nav-page-previous">
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./chapters/01_why_networks.html" class="pagination-link" aria-label="01. 왜 네트워크인가">
+        <span class="nav-page-text">01. 왜 네트워크인가</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Copyright 2026, Eunji</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

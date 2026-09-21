@@ -1,0 +1,111 @@
+/* css styles */
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@import url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-ligature-full.css');
+
+body {
+  font-family: "Pretendard", sans-serif;
+  font-size: 1.1em;   /* 기본 16px → ~17.6px */
+  font-weight: 500;  /* Medium */
+}
+
+/* 소제목 색상 */
+h2 {
+  color: #5B4D80; font-size: 1.4em;
+  background-color: #f3f0f7;
+  padding: 0.3em;
+  border-radius: 8px;
+  margin: 0.3em 0; /* 상하만 margin, 좌우는 0 */
+}
+h3 {
+  color: #7A6A99; font-size: 1.25em;
+  /* background-color: #fbfaff; /* h2보다 훨씬 연하게 */ /*
+  padding: 0.3em;
+  border-radius: 6px;
+  margin: 0.2em 0;
+}
+h4 { 
+  color: #5B4D80; font-size: 1.2em;  /* #9A8DB5 */
+  border-radius: 4px; font-weight: 600;  /* SemiBold */
+  margin: 0.2em 0;
+}
+
+
+/* 코드 공통 */
+code, pre code {
+  font-family: 'D2Coding', 'Fira Code', monospace;
+  font-size: 1em;
+  font-weight: 500
+  border-radius: 6px;
+}
+
+pre {
+  border-radius: 6px;
+  padding: 1em;
+  border: none;
+}
+
+
+/* 일반 코드 블록 (``` 만 쓴 것) */
+pre:not(.sourceCode) {
+  background: #f5f5f5;
+}
+pre:not(.sourceCode) code {
+  color: #555;
+}
+
+/* R 코드 블록 */
+pre.sourceCode, pre.sourceCode code {
+  background: #f5f5f5; /* #f3f0f7: 연보라 */
+  margin: 0;
+}
+.cell-output,
+.cell-output-stderr,
+.cell-output-stdout {
+  margin: 0;
+  padding: 0;
+}
+.cell-output pre {
+  background: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* callout 박스 안 글씨체/크기 */
+.callout-body-container {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 1.2em;
+  font-weight: 500;  /* Medium */
+  color: #555;
+}
+
+/* callout 제목 글씨체 */
+.callout-title-container {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 700;
+  font-size: 1.2em;
+  font-weight: 500;  /* Medium */
+  color: #555;
+}
+
+/* callout 컬러바 */
+.callout {
+  border-left: 3px solid;  /* 왼쪽 컬러바만 남기기 */
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+/* definition */
+dd,
+.callout-body-container {
+  color: #555;
+}
+
+
+/* plot정렬 */
+.cell-output-display {
+  display: flex;
+  justify-content: center;
+}
+
