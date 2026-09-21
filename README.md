@@ -1,5 +1,8 @@
 # Quarto AI 강의 템플릿
 
+
+https://kkonoo.github.io/4_graphs/
+
 통계 이론 설명 + R 코드 실행 + AI 학습 도우미가 통합된 Quarto 강의 사이트 템플릿입니다.
 
 ---
