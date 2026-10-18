@@ -329,23 +329,26 @@ pre code, pre.sourceCode code {
 }
 pre:not(.sourceCode) code { color: var(--course-text); }
 
-/* executed-cell output: no second box inside the code box */
+/* executed-cell output: plain text under the code box — no shading, no border,
+   so code and result are told apart at a glance */
 .cell-output,
 .cell-output-stderr,
 .cell-output-stdout {
   margin: 0;
   padding: 0;
 }
-.cell-output pre {
-  background: var(--course-surface);
-  border: 1px solid var(--course-line);
-  border-top: none;
-  border-radius: 0 0 12px 12px;
-  margin: 0;
+.cell-output pre,
+.cell-output pre code {
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--course-text);
 }
-div.sourceCode + .cell-output pre,
-.cell .sourceCode + .cell-output pre {
-  margin-top: 0;
+.cell-output pre {
+  margin: 0.2em 0 0.8em;
+  padding: 0.1em 1.1em;        /* text lines up with the code inside the box */
+  font-size: 0.92em;
 }
 .cell-output-display {
   display: flex;

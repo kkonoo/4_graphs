@@ -108,10 +108,11 @@ html[data-bs-theme="dark"] {
   border-radius: 12px;
 }
 .reveal div.sourceCode pre { border: none; margin: 0; }
-.reveal .cell-output pre {
-  background: var(--course-surface);
-  border-top: none;
-  border-radius: 0 0 12px 12px;
+.reveal .cell-output pre {          /* result: plain text, no box */
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0.1em 1em;
 }
 
 /* ── Callouts: thin outline, 12px radius, colour only on the left edge ── */
