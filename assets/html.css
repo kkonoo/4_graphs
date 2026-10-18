@@ -277,8 +277,8 @@ h5, h6 {
 }
 .sidebar nav[role="doc-toc"] ul > li > a.active,
 .sidebar nav[role="doc-toc"] ul > li > ul > li > a.active {
-  color: var(--course-accent);
-  border-left: 2px solid var(--course-accent);
+  color: var(--course-accent) !important;   /* Quarto sets this with !important (blue / darkly green) */
+  border-left: 2px solid var(--course-accent) !important;
   font-weight: 600;
 }
 .sidebar .sidebar-search input,
