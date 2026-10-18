@@ -1,62 +1,186 @@
-/* revealjs용 custom.css */
+/* revealjs용 css — 웹 페이지(assets/html.css)와 같은 테마 */
 
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 @import url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-ligature-full.css');
 
-/* 폰트 기본 */
+/* ── Subject colour: Violet — 컴퓨터 (slide-gallery palette) ──────────────
+   Change these six values to re-theme the whole site.              */
+:root {
+  --course-accent: #4B2C7F;
+  --course-accent-rgb: 75, 44, 127;
+  --course-tint: #EDEAF2;
+}
+
+html[data-bs-theme="dark"] {
+  --course-accent: #b39be0;
+  --course-accent-rgb: 179, 155, 224;
+  --course-tint: #2b2440;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HaLab course theme — revealjs slides (shared block, same in every site)
+   Mirrors assets/html.css: neutral grey text, one subject colour used
+   sparingly (slide-title bar, links, progress), thin lines, 12px boxes.
+   The subject colour block above is the only site-specific part.
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  --course-text: #262626;
+  --course-text-2: #666666;
+  --course-bg: #ffffff;
+  --course-surface: #f7f8fa;
+  --course-line: #e3e6eb;
+  --course-code-bg: #f6f7f9;
+}
+
 .reveal {
-  font-family: "Pretendard", sans-serif;
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  font-weight: 400;
+  color: var(--course-text);
+  letter-spacing: -0.01em;
+  word-break: keep-all;
 }
-
-/* 소제목 색상 */
-.reveal h2 { color: #5B4D80; }
-.reveal h3 { color: #7A6A99; }
-.reveal h4 { color: #9A8DB5; }
-
-/* 코드 폰트 */
-.reveal code,
-.reveal pre code {
-  font-family: 'D2Coding', 'Fira Code', monospace;
+.reveal .slide-background-content,
+.reveal-viewport {
+  background: var(--course-bg);
 }
-
-/* 코드 블록 */
-.reveal pre {
-  border-radius: 6px;
-  border: none;
-  width: 100%;        /* revealjs 기본이 좁음 */
+.reveal a {
+  color: var(--course-accent);
 }
+.reveal strong, .reveal b { font-weight: 700; }
 
-/* R 코드 블록 배경 */
-.reveal pre.sourceCode {
-  background: #f3f0f7;
+/* ── Headings: hierarchy by weight; the subject colour only marks the slide title ── */
+.reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+  font-family: inherit;
+  color: var(--course-text);
+  letter-spacing: -0.02em;
+  text-transform: none;
 }
-
-/* callout */
-.reveal .callout {
-  border-left: 3px solid;
-  border-top: none;
-  border-right: none;
-  border-bottom: none;
-}
-
-.reveal .callout-body-container {
-  font-family: 'Pretendard', sans-serif;
-  font-size: 0.85em;
-  color: #555;
-}
-
-.reveal .callout-title-container {
-  font-family: 'Pretendard', sans-serif;
+.reveal h1 { font-weight: 700; }
+.reveal .slides > section > h2,
+.reveal .slides > section > section > h2 {
+  font-size: 1.45em;
   font-weight: 700;
-  color: #555;
+  border-left: 0.22em solid var(--course-accent);
+  padding-left: 0.45em;
+  margin-bottom: 0.6em;
+  text-align: left;
+}
+.reveal h3 { font-size: 1.1em; font-weight: 600; }
+.reveal h4 { font-size: 1em;   font-weight: 600; color: var(--course-text-2); }
+
+/* title slide */
+.reveal .quarto-title-block .title { font-weight: 700; letter-spacing: -0.03em; }
+.reveal .quarto-title-block .subtitle,
+.reveal .quarto-title-block .quarto-title-authors,
+.reveal .quarto-title-block .date,
+.reveal .quarto-title-block .institute {
+  color: var(--course-text-2);
 }
 
-/* plot 정렬 */
+/* ── Code ──────────────────────────────────────────────────────── */
+.reveal code, .reveal pre code {
+  font-family: "D2Coding", "Fira Code", ui-monospace, monospace;
+}
+.reveal :not(pre) > code {
+  color: var(--course-text);
+  background: var(--course-surface);
+  border: 1px solid var(--course-line);
+  border-radius: 6px;
+  padding: 0.05em 0.3em;
+}
+.reveal pre {
+  width: 100%;                 /* reveal's default is narrow */
+  margin: 0.4em 0;
+  background: var(--course-code-bg);
+  border: 1px solid var(--course-line);
+  border-radius: 12px;
+  box-shadow: none;
+}
+.reveal pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0.8em 1em;
+  max-height: 480px;
+}
+.reveal div.sourceCode {
+  background: var(--course-code-bg);
+  border: 1px solid var(--course-line);
+  border-radius: 12px;
+}
+.reveal div.sourceCode pre { border: none; margin: 0; }
+.reveal .cell-output pre {
+  background: var(--course-surface);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+}
+
+/* ── Callouts: thin outline, 12px radius, colour only on the left edge ── */
+.reveal .callout.callout-style-default,
+.reveal .callout.callout-style-simple {
+  border: 1px solid var(--course-line);
+  border-left-width: 3px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.reveal .callout-body-container,
+.reveal .callout-title-container {
+  font-family: inherit;
+  color: var(--course-text);
+}
+.reveal .callout-body-container { font-size: 0.85em; font-weight: 400; }
+.reveal .callout-title-container { font-weight: 700; }
+.reveal div.callout.callout-note { border-left-color: var(--course-accent); }
+.reveal div.callout.callout-note.callout-style-default .callout-title { background-color: var(--course-tint); }
+.reveal div.callout.callout-note .callout-icon::before {   /* same info glyph, in the subject colour */
+  background-image: none;
+  background-color: var(--course-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3E%3Cpath d='m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3E%3Cpath d='m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* ── Tables, quotes, figures ───────────────────────────────────── */
+.reveal table {
+  border-collapse: collapse;
+  word-break: keep-all;
+}
+.reveal table th {
+  font-weight: 700;
+  color: var(--course-text);
+  background: var(--course-surface);
+  border-bottom: 2px solid var(--course-line);
+}
+.reveal table td, .reveal table th {
+  border-bottom: 1px solid var(--course-line);
+  padding: 0.3em 0.6em;
+}
+.reveal table tr:last-child td { border-bottom: none; }
+.reveal blockquote {
+  width: 100%;
+  margin: 0.6em 0;
+  padding: 0.2em 0 0.2em 0.8em;
+  background: none;
+  border-left: 3px solid var(--course-line);
+  box-shadow: none;
+  color: var(--course-text-2);
+  font-style: normal;
+}
 .reveal .cell-output-display {
   display: flex;
   justify-content: center;
 }
-.reveal .slide-content img {
+.reveal .slide-content img,
+.reveal section img {
   display: block;
   margin: 0 auto;
+  border: none;
+  box-shadow: none;
+  background: transparent;
 }
+.reveal figcaption, .reveal .figure-caption { color: var(--course-text-2); font-size: 0.7em; }
+
+/* ── Chrome: progress bar, controls, slide number, footer ───────── */
+.reveal .progress { height: 4px; background: var(--course-line); }
+.reveal .progress span { background: var(--course-accent); }
+.reveal .controls { color: var(--course-accent); }
+.reveal .slide-number { color: var(--course-text-2); background: transparent; font-family: inherit; }
+.reveal .footer { color: var(--course-text-2); font-size: 0.5em; }

@@ -88,55 +88,73 @@ a {
 
 strong, b { font-weight: 700; }
 
-/* ── Headings: hierarchy by weight; the subject colour marks h1 only ── */
+/* ── Headings: hierarchy by weight. The biggest in-chapter heading is dark text
+   with a colour bar in front; the levels below use an underline, then weight only.
+   Which markdown level is the biggest differs between sites (some chapters start
+   at `#`, some at `##`), so build_css.py fills the selectors per site.         ── */
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3 {
   color: var(--course-text);
   letter-spacing: -0.02em;
 }
 
 h1.title {
+  font-size: 2rem;             /* fixed in rem: cosmo and darkly use different base sizes */
   font-weight: 700;
   letter-spacing: -0.03em;
 }
-
-h1:not(.title) {
-  color: var(--course-accent);
-  font-size: 1.55em;
-  font-weight: 700;
-  background: none;
-  border-left: 4px solid var(--course-accent);
-  border-bottom: none;
-  border-radius: 0;
-  padding: 0.05em 0 0.05em 0.55em;
-  margin: 1.8em 0 0.6em;
+.quarto-title .subtitle, .quarto-title p.subtitle.lead {
+  font-size: 1.1rem;
+  color: var(--course-text-2);
 }
 
-h2 {
-  font-size: 1.3em;
+/* biggest heading in a chapter */
+h2, h1:not(.title) {
+  font-size: 1.45em;
+  font-weight: 700;
+  color: var(--course-text);
+  background: none;
+  border: none;
+  border-left: 4px solid var(--course-accent);
+  border-radius: 0;
+  padding: 0.05em 0 0.05em 0.5em;
+  margin: 1.8em 0 0.5em;
+}
+/* a sub-heading right after it sits close, so the two read as one unit */
+h2 + section > h3:first-child, h2 + h3 {
+  margin-top: 0.5em;
+}
+
+/* second level */
+h3 {
+  font-size: 1.2em;
   font-weight: 700;
   background: none;
   border-left: none;
   border-bottom: 1px solid var(--course-line);
   border-radius: 0;
-  padding: 0 0 0.25em;
-  margin: 1.5em 0 0.5em;
+  padding: 0 0 0.2em;
+  margin: 1.4em 0 0.45em;
 }
 
-h3 {
-  font-size: 1.15em;
+/* third level */
+h4 {
+  font-size: 1.08em;
   font-weight: 600;
   background: none;
+  border: none;
   padding: 0;
-  margin: 1.2em 0 0.35em;
+  margin: 1.1em 0 0.3em;
 }
 
-h4, h5, h6 {
-  font-size: 1.05em;
+/* fourth level and below */
+h5, h6 {
+  font-size: 1em;
   font-weight: 600;
   color: var(--course-text-2);
   background: none;
+  border: none;
   padding: 0;
-  margin: 1em 0 0.3em;
+  margin: 0.9em 0 0.25em;
 }
 
 /* callout titles are written as h2/h3 but must not look like section headings */
@@ -168,6 +186,8 @@ h4, h5, h6 {
   background-color: var(--course-nav-bg) !important;
   border-bottom: 1px solid var(--course-line);
   box-shadow: none;
+  padding-top: 0.5rem;          /* same height in light (cosmo) and dark (darkly) */
+  padding-bottom: 0.5rem;
 }
 .navbar .navbar-brand,
 .navbar .nav-link,
