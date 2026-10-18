@@ -136,6 +136,15 @@ $$Z = \frac{\text{관측값} - \text{null 평균}}{\text{null 표준편차}}$$
 
 ------------------------------------------------------------------------
 
+**직접 해 보기** — [네트워크 null model: 차수 보존 재배선 ↗](https://kkonoo.github.io/edu_sims/sims/network-null/?lang=ko){target="_blank"}
+
+::: {.column-page}
+```{=html}
+<iframe src="https://kkonoo.github.io/edu_sims/sims/network-null/?embed=1&lang=ko" title="네트워크 null model: 차수 보존 재배선" loading="lazy"
+        style="width: 100%; height: 1300px; border: 0;"></iframe>
+```
+:::
+
 ## 3. 모티프와 그 유의성 🔺 {#c04-s3}
 
 ### 1) 부분구조, 모티프, graphlet {#c04-s3-1}

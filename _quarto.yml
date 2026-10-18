@@ -114,7 +114,9 @@ format:
     #   margin-width: 300px # toc
 
     # AI 채팅 위젯 전역 설정
-    include-after-body: assets/ai-chat-init.html
+    include-after-body:
+      - assets/ai-chat-init.html
+      - assets/edu-sims-resize.html
 
   revealjs:
     css: assets/revealjs.css    # 슬라이드용
