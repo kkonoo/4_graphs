@@ -3,62 +3,313 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 @import url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-ligature-full.css');
 
+/* ── Subject colour: Violet — 컴퓨터 (slide-gallery palette) ──────────────
+   Change these six values to re-theme the whole site.              */
+:root {
+  --course-accent: #4B2C7F;
+  --course-accent-rgb: 75, 44, 127;
+  --course-tint: #EDEAF2;
+}
+
+body.quarto-dark,
+html[data-bs-theme="dark"] body {
+  --course-accent: #b39be0;
+  --course-accent-rgb: 179, 155, 224;
+  --course-tint: #2b2440;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HaLab course theme — shared block (same in every kkonoo course site)
+   Design rules follow the HaLab slide gallery (kkonoo.github.io/slide-gallery):
+   one base colour per subject + one light step, neutral grey text,
+   hierarchy by weight, thin lines, 12px rounded boxes, line icons.
+   Subject colours live in the block above this one.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Neutral tokens ────────────────────────────────────────────── */
+:root {
+  --course-text: #262626;
+  --course-text-2: #666666;
+  --course-bg: #ffffff;
+  --course-surface: #f7f8fa;
+  --course-line: #e3e6eb;
+  --course-code-bg: #f6f7f9;
+  --course-nav-bg: #f7f8fa;
+  --course-shadow: 0 6px 20px rgba(15, 30, 50, 0.07);
+
+  /* Bootstrap hooks so links, buttons and active states follow the subject colour */
+  --bs-primary: var(--course-accent);
+  --bs-primary-rgb: var(--course-accent-rgb);
+  --bs-link-color: var(--course-accent);
+  --bs-link-color-rgb: var(--course-accent-rgb);
+  --bs-link-hover-color: var(--course-accent);
+  --bs-link-hover-color-rgb: var(--course-accent-rgb);
+  --bs-body-color: var(--course-text);
+}
+
+body.quarto-dark,
+html[data-bs-theme="dark"] body {
+  --course-text: #e6e8eb;
+  --course-text-2: #a9b0b8;
+  --course-bg: #1d2026;
+  --course-surface: #262a30;
+  --course-line: rgba(255, 255, 255, 0.12);
+  --course-code-bg: #272b31;
+  --course-nav-bg: #1a1d22;
+  --course-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+
+  --bs-primary: var(--course-accent);
+  --bs-primary-rgb: var(--course-accent-rgb);
+  --bs-link-color: var(--course-accent);
+  --bs-link-color-rgb: var(--course-accent-rgb);
+  --bs-link-hover-color: var(--course-accent);
+  --bs-link-hover-color-rgb: var(--course-accent-rgb);
+  --bs-body-color: var(--course-text);
+  --bs-body-bg: var(--course-bg);
+}
+
+/* ── Body ──────────────────────────────────────────────────────── */
 body {
-  font-family: "Pretendard", sans-serif;
-  font-size: 1.1em;   /* 기본 16px → ~17.6px */
-  font-weight: 500;  /* Medium */
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  font-size: 1.1em;        /* 16px → ~17.6px */
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  color: var(--course-text);
+  background-color: var(--course-bg);
+  word-break: keep-all;    /* Korean wraps at word boundaries */
 }
 
-/* 소제목 색상 */
+a {
+  color: var(--course-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+strong, b { font-weight: 700; }
+
+/* ── Headings: hierarchy by weight; the subject colour marks h1 only ── */
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3 {
+  color: var(--course-text);
+  letter-spacing: -0.02em;
+}
+
+h1.title {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+h1:not(.title) {
+  color: var(--course-accent);
+  font-size: 1.55em;
+  font-weight: 700;
+  background: none;
+  border-left: 4px solid var(--course-accent);
+  border-bottom: none;
+  border-radius: 0;
+  padding: 0.05em 0 0.05em 0.55em;
+  margin: 1.8em 0 0.6em;
+}
+
 h2 {
-  color: #5B4D80; font-size: 1.4em;
-  background-color: #f3f0f7;
-  padding: 0.3em;
-  border-radius: 8px;
-  margin: 0.3em 0; /* 상하만 margin, 좌우는 0 */
+  font-size: 1.3em;
+  font-weight: 700;
+  background: none;
+  border-left: none;
+  border-bottom: 1px solid var(--course-line);
+  border-radius: 0;
+  padding: 0 0 0.25em;
+  margin: 1.5em 0 0.5em;
 }
+
 h3 {
-  color: #7A6A99; font-size: 1.25em;
-  /* background-color: #fbfaff; /* h2보다 훨씬 연하게 */ /*
-  padding: 0.3em;
-  border-radius: 6px;
-  margin: 0.2em 0;
-}
-h4 { 
-  color: #5B4D80; font-size: 1.2em;  /* #9A8DB5 */
-  border-radius: 4px; font-weight: 600;  /* SemiBold */
-  margin: 0.2em 0;
+  font-size: 1.15em;
+  font-weight: 600;
+  background: none;
+  padding: 0;
+  margin: 1.2em 0 0.35em;
 }
 
+h4, h5, h6 {
+  font-size: 1.05em;
+  font-weight: 600;
+  color: var(--course-text-2);
+  background: none;
+  padding: 0;
+  margin: 1em 0 0.3em;
+}
 
-/* 코드 공통 */
-code, pre code {
-  font-family: 'D2Coding', 'Fira Code', monospace;
-  font-size: 1em;
-  font-weight: 500
+/* callout titles are written as h2/h3 but must not look like section headings */
+.callout h2, .callout h3, .callout h4,
+.callout-title-container h2, .callout-title-container h3, .callout-title-container h4 {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* Quarto's anchor hash link next to headings */
+.anchorjs-link { color: var(--course-text-2); }
+
+/* ── Title block & categories ──────────────────────────────────── */
+.quarto-title-meta-heading { color: var(--course-text-2); }
+.quarto-category {
+  border: 1px solid var(--course-line) !important;
   border-radius: 6px;
+  color: var(--course-text-2) !important;
+  background: var(--course-surface);
+  font-weight: 600;
+}
+
+/* ── Navbar: flat surface with one thin line, no coloured bar ───── */
+.navbar {
+  background-color: var(--course-nav-bg) !important;
+  border-bottom: 1px solid var(--course-line);
+  box-shadow: none;
+}
+.navbar .navbar-brand,
+.navbar .nav-link,
+.navbar .navbar-nav .nav-link,
+.navbar .quarto-navigation-tool,
+.navbar .navbar-toggler {
+  color: var(--course-text) !important;
+}
+.navbar .navbar-nav .nav-link:hover,
+.navbar .navbar-nav .nav-link.active,
+.navbar .navbar-nav .show > .nav-link {
+  color: var(--course-accent) !important;
+}
+.navbar .dropdown-menu {
+  background-color: var(--course-bg);
+  border: 1px solid var(--course-line);
+  border-radius: 12px;
+  box-shadow: var(--course-shadow);
+  padding: 6px;
+}
+.navbar .dropdown-item {
+  color: var(--course-text);
+  border-radius: 8px;
+}
+.navbar .dropdown-item:hover,
+.navbar .dropdown-item:focus {
+  background-color: var(--course-surface);
+  color: var(--course-accent);
+}
+.navbar .dropdown-item.active {
+  background-color: var(--course-tint);
+  color: var(--course-accent);
+}
+.navbar-toggler { border: 1px solid var(--course-line); border-radius: 10px; }
+#quarto-search .aa-DetachedSearchButton,
+.navbar .aa-DetachedSearchButton {
+  color: var(--course-text) !important;
+  background: transparent;
+}
+
+/* ── Sidebar (chapter list) and table of contents ───────────────── */
+#quarto-sidebar,
+.sidebar.sidebar-navigation {
+  background-color: var(--course-bg);      /* darkly paints it a lighter grey */
+}
+.quarto-page-breadcrumbs .breadcrumb,
+.breadcrumb {
+  background: transparent;                  /* darkly gives breadcrumbs a grey band */
+  padding-left: 0;
+}
+.breadcrumb-item + .breadcrumb-item::before { color: var(--course-text-2); }
+.quarto-page-breadcrumbs .breadcrumb-item.active { color: var(--course-text-2); }
+.sidebar-navigation .sidebar-item-container .sidebar-link,
+.sidebar-navigation .sidebar-item .sidebar-link {
+  color: var(--course-text-2);
+}
+.sidebar-navigation .sidebar-item-container .sidebar-link:hover,
+.sidebar-navigation .sidebar-item-container .sidebar-link.active,
+.sidebar-navigation .sidebar-item-container .sidebar-link.active .menu-text,
+.sidebar-navigation .sidebar-item.active > .sidebar-item-container > .sidebar-link {
+  color: var(--course-accent);
+}
+.sidebar-navigation .sidebar-section .sidebar-item-container > .sidebar-item-text,
+.sidebar-navigation .sidebar-item-section .sidebar-item-toggle,
+.sidebar-navigation .sidebar-item-text {
+  color: var(--course-text);
+}
+.sidebar nav[role="doc-toc"] > h2,
+#toc-title {
+  color: var(--course-text-2);
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+  padding: 0;
+  margin: 0 0 0.5em;
+}
+.sidebar nav[role="doc-toc"] > ul > li > a,
+.sidebar nav[role="doc-toc"] > ul > li > ul > li > a,
+.sidebar nav[role="doc-toc"] ul > li > a {
+  color: var(--course-text-2);
+  border-left: 1px solid var(--course-line);
+}
+.sidebar nav[role="doc-toc"] ul > li > a:hover {
+  color: var(--course-accent);
+}
+.sidebar nav[role="doc-toc"] ul > li > a.active,
+.sidebar nav[role="doc-toc"] ul > li > ul > li > a.active {
+  color: var(--course-accent);
+  border-left: 2px solid var(--course-accent);
+  font-weight: 600;
+}
+.sidebar .sidebar-search input,
+.sidebar-search .aa-Form {
+  border: 1px solid var(--course-line);
+  border-radius: 10px;
+}
+
+/* ── Code ──────────────────────────────────────────────────────── */
+code, pre code, kbd {
+  font-family: "D2Coding", "Fira Code", ui-monospace, monospace;
+}
+
+:not(pre) > code {
+  font-size: 0.92em;
+  color: var(--course-text);
+  background: var(--course-surface);
+  border: 1px solid var(--course-line);
+  border-radius: 6px;
+  padding: 0.05em 0.35em;
 }
 
 pre {
-  border-radius: 6px;
-  padding: 1em;
-  border: none;
+  font-size: 0.95em;
+  line-height: 1.55;
+  background: var(--course-code-bg);
+  border: 1px solid var(--course-line);
+  border-radius: 12px;
+  padding: 1em 1.1em;
 }
 
-
-/* 일반 코드 블록 (``` 만 쓴 것) */
-pre:not(.sourceCode) {
-  background: #f5f5f5;
-}
-pre:not(.sourceCode) code {
-  color: #555;
-}
-
-/* R 코드 블록 */
-pre.sourceCode, pre.sourceCode code {
-  background: #f5f5f5; /* #f3f0f7: 연보라 */
+pre.sourceCode,
+div.sourceCode {
+  background: var(--course-code-bg);
+  border: 1px solid var(--course-line);
+  border-radius: 12px;
   margin: 0;
 }
+div.sourceCode pre.sourceCode {
+  border: none;
+  margin: 0;
+}
+pre code, pre.sourceCode code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border: none;
+}
+pre:not(.sourceCode) code { color: var(--course-text); }
+
+/* executed-cell output: no second box inside the code box */
 .cell-output,
 .cell-output-stderr,
 .cell-output-stdout {
@@ -66,46 +317,309 @@ pre.sourceCode, pre.sourceCode code {
   padding: 0;
 }
 .cell-output pre {
-  background: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* callout 박스 안 글씨체/크기 */
-.callout-body-container {
-  font-family: 'Pretendard', sans-serif;
-  font-size: 1.2em;
-  font-weight: 500;  /* Medium */
-  color: #555;
-}
-
-/* callout 제목 글씨체 */
-.callout-title-container {
-  font-family: 'Pretendard', sans-serif;
-  font-weight: 700;
-  font-size: 1.2em;
-  font-weight: 500;  /* Medium */
-  color: #555;
-}
-
-/* callout 컬러바 */
-.callout {
-  border-left: 3px solid;  /* 왼쪽 컬러바만 남기기 */
+  background: var(--course-surface);
+  border: 1px solid var(--course-line);
   border-top: none;
-  border-right: none;
-  border-bottom: none;
+  border-radius: 0 0 12px 12px;
+  margin: 0;
 }
-
-/* definition */
-dd,
-.callout-body-container {
-  color: #555;
+div.sourceCode + .cell-output pre,
+.cell .sourceCode + .cell-output pre {
+  margin-top: 0;
 }
-
-
-/* plot정렬 */
 .cell-output-display {
   display: flex;
   justify-content: center;
 }
+.code-copy-button:hover > .bi::before { background-color: var(--course-accent); }
 
+/* ── Callouts: thin outline, 12px radius, colour only on the left edge ── */
+.callout.callout-style-default,
+.callout.callout-style-simple {
+  border: 1px solid var(--course-line);
+  border-left-width: 3px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--course-bg);
+}
+.callout .callout-header {
+  font-weight: 700;
+}
+.callout-body-container,
+.callout-title-container {
+  font-family: inherit;
+  font-size: 1em;
+  color: var(--course-text);
+}
+.callout-body-container { font-weight: 400; }
+.callout-title-container { font-weight: 700; }
+.callout.callout-style-default > .callout-header {
+  opacity: 1;
+}
+/* "note" takes the subject colour; the other kinds keep Quarto's semantic colours */
+div.callout-note.callout {
+  border-left-color: var(--course-accent) !important;
+}
+div.callout-note.callout-style-default > .callout-header {
+  background-color: var(--course-tint);
+}
+div.callout-note .callout-icon::before {
+  filter: none;
+}
+
+/* ── Tables ────────────────────────────────────────────────────── */
+table {
+  word-break: keep-all;
+  border-color: var(--course-line);
+}
+.table > :not(caption) > * > * {
+  background-color: transparent;
+  color: inherit;
+  border-bottom-color: var(--course-line);
+  padding: 0.5rem 0.75rem;
+}
+thead th,
+.table > thead > tr > th {
+  color: var(--course-text);
+  font-weight: 700;
+  border-bottom: 2px solid var(--course-line);
+  background-color: var(--course-surface);
+}
+.table > :not(:first-child) { border-top: none; }
+.table-striped > tbody > tr:nth-of-type(odd) > * { background-color: var(--course-surface); }
+
+/* ── Misc blocks ───────────────────────────────────────────────── */
+blockquote, .blockquote {
+  border-left: 3px solid var(--course-line);
+  color: var(--course-text-2);
+  padding-left: 1em;
+  margin: 1em 0;
+}
+dd { color: var(--course-text); }
+dt { font-weight: 700; }
+hr { border-top: 1px solid var(--course-line); opacity: 1; }
+img { border-radius: 8px; }
+body.quarto-dark img,
+html[data-bs-theme="dark"] img { opacity: 0.92; }
+figcaption, .figure-caption { color: var(--course-text-2); font-size: 0.9em; }
+details > summary { cursor: pointer; }
+
+.nav-page .nav-page-text,
+.page-navigation a {
+  color: var(--course-accent);
+}
+.nav-footer, .page-footer {
+  color: var(--course-text-2);
+  border-top: 1px solid var(--course-line);
+}
+.nav-footer a, .page-footer a { color: var(--course-text-2); }
+
+.btn-primary {
+  background-color: var(--course-accent);
+  border-color: var(--course-accent);
+  color: #fff;
+}
+.btn-outline-primary {
+  color: var(--course-accent);
+  border-color: var(--course-accent);
+}
+.pagination .page-link, .nav-pills .nav-link.active, .list-group-item.active {
+  color: var(--course-accent);
+}
+.nav-pills .nav-link.active, .list-group-item.active {
+  background-color: var(--course-tint);
+  border-color: var(--course-tint);
+}
+.nav-tabs .nav-link.active {
+  color: var(--course-accent);
+  border-bottom-color: var(--course-bg);
+}
+.panel-tabset .nav-tabs { border-bottom-color: var(--course-line); }
+
+/* search results */
+#quarto-search-results li.aa-Item[aria-selected="true"] .search-item,
+.aa-DetachedOverlay li.aa-Item[aria-selected="true"] .search-item {
+  background-color: var(--course-tint);
+}
+
+/* ── AI chat widget (assets/ai-chat-init.html) in both themes ───── */
+#ai-chat-panel {
+  border-radius: 12px;
+  box-shadow: var(--course-shadow);
+}
+body.quarto-dark #ai-chat-panel,
+html[data-bs-theme="dark"] #ai-chat-panel {
+  background: #1f242a !important;
+  color: var(--course-text);
+  border: 1px solid var(--course-line);
+}
+body.quarto-dark #ai-chat-messages,
+html[data-bs-theme="dark"] #ai-chat-messages { background: #1f242a; }
+body.quarto-dark .ai-msg.assistant,
+body.quarto-dark .ai-typing,
+html[data-bs-theme="dark"] .ai-msg.assistant,
+html[data-bs-theme="dark"] .ai-typing {
+  background: #2a3038 !important;
+  color: var(--course-text) !important;
+}
+body.quarto-dark #ai-chat-input-row,
+html[data-bs-theme="dark"] #ai-chat-input-row { border-top-color: var(--course-line) !important; }
+body.quarto-dark #ai-chat-input,
+html[data-bs-theme="dark"] #ai-chat-input {
+  color: var(--course-text) !important;
+  background: #262b31 !important;
+  border-color: var(--course-line) !important;
+}
+
+/* ── Phones: wide tables scroll inside the page, long inline code wraps ── */
+@media (max-width: 767.98px) {
+  main table {
+    display: block;
+    overflow-x: auto;
+  }
+  main :not(pre) > code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* ── Site controls: language button + colour-scheme button ────────
+   Two separate square tiles (language, theme) placed left of the
+   navbar search icon. The language tile shows the language you will
+   switch TO; the theme tile shows the mode you will switch TO
+   (moon in light mode, sun in dark mode). Quarto's own toggle keeps
+   its behaviour; only its appearance is replaced.                   */
+:root {
+  --site-ctl-size: 44px;
+  --site-ctl-radius: 12px;
+  --site-ctl-icon: 20px;
+  --site-ctl-bg: #ffffff;
+  --site-ctl-bg-hover: #f1f3f6;
+  --site-ctl-border: #dde2e8;
+  --site-ctl-fg: #1f2430;
+  --site-ctl-focus: #0f4c6e;
+  --site-icon-moon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z'/%3E%3C/svg%3E");
+  --site-icon-sun: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41'/%3E%3C/svg%3E");
+}
+
+body.quarto-dark,
+html[data-bs-theme="dark"] body {
+  --site-ctl-bg: #262b33;
+  --site-ctl-bg-hover: #323842;
+  --site-ctl-border: rgba(255, 255, 255, 0.16);
+  --site-ctl-fg: #eef1f4;
+  --site-ctl-focus: #8fd1d1;
+}
+
+.quarto-navbar-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.course-language-switch {
+  display: inline-flex;
+  margin: 0;
+}
+
+.course-language-switch a,
+.course-language-switch span,
+.quarto-navbar-tools .quarto-color-scheme-toggle {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: var(--site-ctl-size);
+  height: var(--site-ctl-size);
+  min-width: var(--site-ctl-size);
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 1px solid var(--site-ctl-border);
+  border-radius: var(--site-ctl-radius);
+  background: var(--site-ctl-bg);
+  color: var(--site-ctl-fg) !important;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-decoration: none !important;
+  box-shadow: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.course-language-switch a:hover,
+.quarto-navbar-tools .quarto-color-scheme-toggle:hover {
+  background: var(--site-ctl-bg-hover);
+  color: var(--site-ctl-fg) !important;
+}
+
+.course-language-switch .is-unavailable {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.course-language-switch .pending {   /* translation not ready: links to the KO home instead */
+  opacity: 0.6;
+}
+
+.course-language-switch a:focus-visible,
+.quarto-navbar-tools .quarto-color-scheme-toggle:focus-visible {
+  outline: 2px solid var(--site-ctl-focus);
+  outline-offset: 2px;
+}
+
+/* Theme icon: Quarto's toggle-switch glyph is replaced by a line icon
+   drawn with a CSS mask, so it follows the tile's text colour.       */
+.quarto-navbar-tools .quarto-color-scheme-toggle .bi {
+  display: block;
+  width: var(--site-ctl-icon);
+  height: var(--site-ctl-icon);
+  font-size: 0;
+  line-height: 0;
+}
+
+.quarto-navbar-tools .quarto-color-scheme-toggle .bi::before {
+  content: "" !important;
+  display: block;
+  width: var(--site-ctl-icon) !important;
+  height: var(--site-ctl-icon) !important;
+  margin: 0;
+  vertical-align: top;
+  background: currentColor !important;
+  background-image: none !important;
+  -webkit-mask: var(--site-icon-moon) center / contain no-repeat;
+  mask: var(--site-icon-moon) center / contain no-repeat;
+}
+
+.quarto-navbar-tools .quarto-color-scheme-toggle.alternate .bi::before,
+body.quarto-dark .quarto-navbar-tools .quarto-color-scheme-toggle .bi::before,
+html[data-bs-theme="dark"] .quarto-navbar-tools .quarto-color-scheme-toggle .bi::before {
+  -webkit-mask-image: var(--site-icon-sun);
+  mask-image: var(--site-icon-sun);
+}
+
+@media (max-width: 991.98px) {
+  :root {
+    --site-ctl-size: 38px;
+    --site-ctl-radius: 10px;
+    --site-ctl-icon: 18px;
+  }
+
+  .quarto-navbar-tools {
+    gap: 8px;
+  }
+
+  .course-language-switch a,
+  .course-language-switch span {
+    font-size: 0.85rem;
+  }
+}
+
+/* phones: keep the two tiles next to the search icon instead of floating mid-bar */
+@media (max-width: 991.98px) {
+  .navbar .navbar-container .quarto-navbar-tools {
+    margin-left: auto;
+  }
+  .navbar .navbar-container .type-overlay {
+    margin-left: 6px !important;
+  }
+}

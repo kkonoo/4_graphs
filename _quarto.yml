@@ -92,6 +92,8 @@ format:
   html:
     theme:
       light: cosmo
+      dark: darkly
+    respect-user-color-scheme: true
     css: assets/html.css
     toc: true
     toc-depth: 4
