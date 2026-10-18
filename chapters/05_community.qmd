@@ -79,6 +79,15 @@ $$Q = (\text{커뮤니티 안에 있는 엣지 비율}) - (\text{우연이라면
 
 ------------------------------------------------------------------------
 
+**직접 해 보기** — [네트워크 null model: 차수 보존 재배선 ↗](https://kkonoo.github.io/edu_sims/sims/network-null/?lang=ko){target="_blank"}
+
+::: {.column-page}
+```{=html}
+<iframe src="https://kkonoo.github.io/edu_sims/sims/network-null/?embed=1&lang=ko" title="네트워크 null model: 차수 보존 재배선" loading="lazy"
+        style="width: 100%; height: 1300px; border: 0;"></iframe>
+```
+:::
+
 ## 2. 알고리즘 계보 🧬 {#c05-s2}
 
 ### 1) 네 가지 {#c05-s2-1}
