@@ -60,7 +60,7 @@ format:
 ```
 
 - `torch`는 Colab에 이미 설치되어 있습니다
-- ⚠️ PyTorch Geometric은 버전 충돌이 잦습니다. 설치 후 아래로 확인하세요
+- ⚠️ PyTorch Geometric은 버전 충돌이 잦습니다. 설치한 뒤 아래 코드로 확인하세요
 
 ```python
 import torch, torch_geometric
