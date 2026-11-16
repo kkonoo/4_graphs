@@ -1,5 +1,5 @@
 ---
-title: "91. 용어집"
+title: "B. 용어집"
 description: "챕터별 용어 한영 대조표"
 author: "Eunji Ha"
 date: today
@@ -8,7 +8,8 @@ format:
   html:
     include-in-header:
       text: |
-        <meta name="ai-title" content="91. 용어집">
+        <style>main table td:last-child a { white-space: nowrap; }</style>
+        <meta name="ai-title" content="B. 용어집">
         <meta name="ai-context" content="
         이 페이지는 강의 전체에서 쓰는 용어의 한영 대조표입니다. Part 1(그래프)은
         노드, 엣지, 인접 행렬, 엣지 목록, 희소, 이분 그래프, 사영, 연결 요소,
@@ -28,7 +29,7 @@ format:
         ">
 ---
 
-> 챕터마다 용어표를 반복하지 않고 여기에 모읍니다. 처음 등장한 챕터를 함께 적었습니다.
+> 챕터마다 용어표를 반복하지 않고 여기에 모읍니다. 처음 등장하는 절을 함께 적었습니다. 누르면 그 절로 갑니다.
 
 ------------------------------------------------------------------------
 
@@ -36,33 +37,33 @@ format:
 
 | 용어 | 한국어 | 한 줄 뜻 | 처음 나오는 곳 |
 |---------|---------|----------------------------------|---------|
-| Node (vertex) | 노드, 꼭짓점 | 네트워크의 구성 단위 — 유전자, 세포, 환자 | 01 |
-| Edge | 엣지, 간선 | 두 노드 사이의 관계 | 01 |
-| Natural graph | 자연 그래프 | 연결이 물리적으로 실재하는 그래프 | 01 |
-| Information graph | 정보 그래프 | 연결을 우리가 부여한 그래프 | 01 |
-| Adjacency matrix | 인접 행렬 | 연결을 n × n 행렬로 표현한 것 | 02 |
-| Edge list | 엣지 목록 | (i, j) 쌍의 나열 | 02 |
-| Sparse | 희소 | 가능한 연결 중 극히 일부만 존재하는 상태 | 02 |
-| Bipartite graph | 이분 그래프 | 노드가 두 집단으로 나뉘고 집단 간에만 연결 | 02 |
-| Projection | 사영 | 이분 그래프를 한쪽 집단만의 그래프로 바꾸기 | 02 |
-| Component | 연결 요소 | 서로 도달 가능한 노드의 묶음 | 02 |
-| Articulation node | 절단점 | 제거하면 네트워크가 쪼개지는 노드 | 02 |
-| Degree | 차수 | 한 노드에 붙은 엣지 수 | 02 |
-| Degree distribution | 차수 분포 | 차수 k를 가진 노드의 비율 P(k) | 03 |
-| Clustering coefficient | 뭉침 계수 | 내 이웃끼리 서로 이웃인 정도 | 03 |
-| Betweenness centrality | 매개 중심성 | 최단경로가 나를 지나는 정도 — bottleneck | 03 |
-| PageRank | 페이지랭크 | 랜덤워크가 머무는 확률로 잰 중요도 | 03 |
-| Null model | 귀무 모형 | "우연이라면 이만큼"을 만들어주는 비교 그래프 | 04 |
-| Rewiring | 재배선 | 차수를 보존한 채 엣지를 섞어 null을 만드는 방법 | 04 |
-| Motif | 모티프 | null보다 유의하게 자주 나타나는 부분구조 | 04 |
-| Modularity (Q) | 모듈성 | 커뮤니티 분할이 얼마나 좋은지 나타내는 점수 | 05 |
-| Louvain / Leiden | — | 모듈성을 최대화하는 커뮤니티 검출 알고리즘 | 05 |
-| Resolution | 해상도 | 커뮤니티를 얼마나 잘게 쪼갤지 정하는 파라미터 | 05 |
-| Laplacian | 라플라시안 | L = D − A. 스펙트럴 방법의 출발점 | 05 |
-| Fiedler vector | 피들러 벡터 | 두 번째 고유벡터 — 그래프를 이등분 | 05 |
-| Random walk with restart | 재시작 랜덤워크 | 시드에서 출발해 네트워크로 퍼뜨리는 방법 | 06 |
-| Link prediction | 링크 예측 | 아직 없는 엣지가 있을 법한지 예측 | 06 |
-| Study bias | 연구 편향 | 많이 연구된 대상이 hub처럼 보이는 현상 | 07 |
+| Node (vertex) | 노드, 꼭짓점 | 네트워크의 구성 단위 — 유전자, 세포, 환자 | [01 §1-1](01_why_networks.qmd#c01-s1-1) |
+| Edge | 엣지, 간선 | 두 노드 사이의 관계 | [01 §1-1](01_why_networks.qmd#c01-s1-1) |
+| Natural graph | 자연 그래프 | 연결이 물리적으로 실재하는 그래프 | [01 §1-2](01_why_networks.qmd#c01-s1-2) |
+| Information graph | 정보 그래프 | 연결을 우리가 부여한 그래프 | [01 §1-2](01_why_networks.qmd#c01-s1-2) |
+| Adjacency matrix | 인접 행렬 | 연결을 n × n 행렬로 표현한 것 | [02 §2](02_representation.qmd#c02-s2) |
+| Edge list | 엣지 목록 | (i, j) 쌍의 나열 | [02 §2](02_representation.qmd#c02-s2) |
+| Sparse | 희소 | 가능한 연결 중 극히 일부만 존재하는 상태 | [02 §2-2](02_representation.qmd#c02-s2-2) |
+| Bipartite graph | 이분 그래프 | 노드가 두 집단으로 나뉘고 집단 간에만 연결 | [02 §1-2](02_representation.qmd#c02-s1-2) |
+| Projection | 사영 | 이분 그래프를 한쪽 집단만의 그래프로 바꾸기 | [02 §1-2](02_representation.qmd#c02-s1-2) |
+| Component | 연결 요소 | 서로 도달 가능한 노드의 묶음 | [02 §3-1](02_representation.qmd#c02-s3-1) |
+| Articulation node | 절단점 | 제거하면 네트워크가 쪼개지는 노드 | [02 §3-2](02_representation.qmd#c02-s3-2) |
+| Degree | 차수 | 한 노드에 붙은 엣지 수 | [02 §2-3](02_representation.qmd#c02-s2-3) |
+| Degree distribution | 차수 분포 | 차수 k를 가진 노드의 비율 P(k) | [03 §1](03_metrics.qmd#c03-s1) |
+| Clustering coefficient | 뭉침 계수 | 내 이웃끼리 서로 이웃인 정도 | [03 §2-2](03_metrics.qmd#c03-s2-2) |
+| Betweenness centrality | 매개 중심성 | 최단경로가 나를 지나는 정도 — bottleneck | [03 §3-2](03_metrics.qmd#c03-s3-2) |
+| PageRank | 페이지랭크 | 랜덤워크가 머무는 확률로 잰 중요도 | [03 §3-1](03_metrics.qmd#c03-s3-1) |
+| Null model | 귀무 모형 | "우연이라면 이만큼"을 만들어주는 비교 그래프 | [04 §2](04_random_null.qmd#c04-s2) |
+| Rewiring | 재배선 | 차수를 보존한 채 엣지를 섞어 null을 만드는 방법 | [04 §2-2](04_random_null.qmd#c04-s2-2) |
+| Motif | 모티프 | null보다 유의하게 자주 나타나는 부분구조 | [04 §3](04_random_null.qmd#c04-s3) |
+| Modularity (Q) | 모듈성 | 커뮤니티 분할이 얼마나 좋은지 나타내는 점수 | [05 §1](05_community.qmd#c05-s1) |
+| Louvain / Leiden | — | 모듈성을 최대화하는 커뮤니티 검출 알고리즘 | [05 §2-1](05_community.qmd#c05-s2-1) |
+| Resolution | 해상도 | 커뮤니티를 얼마나 잘게 쪼갤지 정하는 파라미터 | [05 §3](05_community.qmd#c05-s3) |
+| Laplacian | 라플라시안 | L = D − A. 스펙트럴 방법의 출발점 | [05 §4-1](05_community.qmd#c05-s4-1) |
+| Fiedler vector | 피들러 벡터 | 두 번째 고유벡터 — 그래프를 이등분 | [05 §4-3](05_community.qmd#c05-s4-3) |
+| Random walk with restart | 재시작 랜덤워크 | 시드에서 출발해 네트워크로 퍼뜨리는 방법 | [06 §2-1](06_propagation.qmd#c06-s2-1) |
+| Link prediction | 링크 예측 | 아직 없는 엣지가 있을 법한지 예측 | [06 §3](06_propagation.qmd#c06-s3) |
+| Study bias | 연구 편향 | 많이 연구된 대상이 hub처럼 보이는 현상 | [07 §2-1](07_practice.qmd#c07-s2-1) |
 
 ------------------------------------------------------------------------
 
@@ -70,66 +71,66 @@ format:
 
 | 용어 | 한국어 | 한 줄 뜻 | 처음 나오는 곳 |
 |---------|---------|----------------------------------|---------|
-| Perceptron | 퍼셉트론 | 가중합에 비선형을 씌운 최소 단위 | 08 |
-| Activation function | 활성함수 | 비선형을 넣는 함수 (ReLU 등) | 08 |
-| Backpropagation | 역전파 | 연쇄법칙으로 기울기를 거슬러 계산 | 08 |
-| Multilayer perceptron (MLP) | 다층 퍼셉트론 | 은닉층을 하나 이상 둔 완전연결 신경망 | 08 |
-| Loss function | 손실 함수 | 예측이 얼마나 틀렸는지 재는 값 (MSE, cross-entropy) | 08 |
-| Logit | 로짓 | sigmoid·softmax를 거치기 전의 출력값 | 08 |
-| Gradient descent | 경사하강법 | 손실이 줄어드는 방향으로 가중치를 조금씩 옮기는 방법 | 08 |
-| Learning rate | 학습률 | 경사하강에서 한 번에 움직이는 크기 η | 08 |
-| Vanishing gradient | 기울기 소실 | 입력 쪽 층으로 갈수록 기울기가 0에 가까워지는 현상 | 08 |
-| Dead ReLU | 죽은 뉴런 | 모든 입력에서 0을 내어 더 이상 학습되지 않는 ReLU 뉴런 | 08 |
-| He initialization | He 초기화 | ReLU 망에 맞춘 가중치 초기화 (분산 2/n) | 08 |
-| Universal approximation theorem | 보편 근사 정리 | 은닉층 하나로도 연속함수를 근사할 수 있다는 정리 — 학습과 일반화는 보장하지 않음 | 08 |
-| Overfitting | 과적합 | 학습 데이터만 잘 맞추는 상태 | 09 |
-| Regularization | 정규화 | 과적합을 막는 장치 (dropout, weight decay) | 09 |
-| Train / validation / test | 학습 / 검증 / 시험 데이터 | 학습용, 고르기용, 최종 보고용 (한 번만) | 09 |
-| Data leakage | 데이터 누수 | test의 정보가 학습·선택 과정에 새어 들어가는 것 | 09 |
-| Nested CV | 중첩 교차검증 | 모델을 고르는 CV를 바깥 CV로 한 번 더 감싸는 방법 | 09 |
-| Early stopping | 조기 종료 | validation loss가 최저일 때 학습을 멈춤 | 09 |
-| Weight decay | 가중치 감쇠 | 가중치 크기에 벌점을 주는 정규화 | 09 |
-| Dropout | 드롭아웃 | 학습 중 뉴런을 무작위로 끄는 정규화 | 09 |
-| Elastic net | — | L1과 L2 규제를 섞은 선형 모델 | 09 |
-| Balanced accuracy | 균형 정확도 | 클래스별 재현율의 평균 — 불균형 데이터용 | 09 |
-| Batch effect | 배치 효과 | 처리 날짜·lane·기관 같은 기술적 차이가 데이터에 남긴 흔적 | 09 |
-| Shortcut learning | 지름길 학습 | 라벨과 우연히 얽힌 신호로 정답을 맞히는 것 | 09 |
-| Pseudoreplication | 유사반복 | 독립이 아닌 관측(같은 환자의 세포)을 독립으로 세는 것 | 09 |
-| Inductive bias | 귀납 편향 | 데이터를 보기 전에 모델 구조에 넣어둔 가정 | 10 |
-| Convolutional neural network (CNN) | 합성곱 신경망 | 같은 필터를 위치마다 밀며 적용하는 신경망 — 학습되는 PWM 스캐너 | 10 |
-| Weight sharing | 가중치 공유 | 모든 위치에 같은 파라미터를 쓰는 것 | 10 |
-| Pooling | 풀링 | 여러 위치의 반응을 최댓값·평균 하나로 요약 — 위치 정보를 버림 | 10 |
-| Recurrent neural network (RNN), LSTM | 순환 신경망 | 서열을 한 칸씩 읽으며 은닉 상태를 갱신하는 구조 | 10 |
-| Autoencoder | 오토인코더 | 압축했다 복원하며 표현을 배우는 구조 | 10 |
-| Latent space | 잠재 공간 | 압축된 표현이 사는 저차원 공간 | 10 |
-| Variational autoencoder (VAE) | 변분 오토인코더 | 잠재를 점이 아니라 분포로 두는 오토인코더 — scVI의 뼈대 | 10 |
-| Attention | 어텐션 | 어디를 볼지 가중치로 배우는 방식 | 10 |
-| Transformer, self-attention | 트랜스포머, 자기 어텐션 | 모든 위치 쌍 사이의 어텐션을 층으로 쌓은 구조 | 10 |
-| Node embedding | 노드 임베딩 | 노드를 벡터로 바꾼 것 | 11 |
-| Encoder–decoder | 인코더–디코더 | 노드를 벡터로 보내고(encoder), 두 벡터의 내적으로 유사도를 재현(decoder)하는 틀 | 11 |
-| Shallow embedding | 얕은 임베딩 | 노드마다 벡터를 따로 두는 표 조회식 encoder | 11 |
-| word2vec, skip-gram | — | 가까이 함께 나오는 단어(노드)를 비슷한 벡터로 학습하는 얕은 신경망 | 11 |
-| Negative sampling | 음성 샘플링 | 무작위로 뽑은 쌍을 "비슷하지 않은 쌍"으로 써서 학습하는 방법 | 11 |
-| DeepWalk | — | 균일한 랜덤워크 + word2vec 노드 임베딩 | 11 |
-| node2vec | — | p·q로 성향을 준 랜덤워크 + word2vec 노드 임베딩 | 11 |
-| Structural equivalence (role) | 구조적 동등성 (역할) | 멀리 있어도 연결 구조의 모양이 같은 노드 | 11 |
-| Transductive / inductive | 전이적 / 귀납적 | 새 노드에 적용 불가 / 가능 | 11 |
-| Message passing | 메시지 전달 | 이웃 정보를 모아 노드를 갱신하는 GNN의 핵심 연산 | 12 |
-| Aggregate / update | 집계 / 갱신 | 이웃을 순서와 무관한 함수로 모으고, 학습되는 W로 내 표현을 새로 만드는 두 단계 | 12 |
-| Permutation invariance | 순열 불변성 | 이웃의 순서를 바꿔도 결과가 같은 성질 | 12 |
-| GCN / GraphSAGE / GAT | — | 이웃을 집계하는 세 가지 방식 (평균 / 나 자신을 따로 / 어텐션) | 12 |
-| GIN | — | 합으로 집계해 1-WL 검정만큼 구별하는 GNN | 12 |
-| SGC | — | 비선형을 빼고 Â^K X 에 선형 모델 하나만 얹은 GNN | 12 |
-| Homophily / heterophily | 동종친화 / 이종친화 | 이웃끼리 같은 부류인 정도가 높은 / 낮은 그래프 | 12 |
-| Over-smoothing | 과평활화 | 층을 쌓을수록 모든 노드가 같아지는 현상 | 12 |
-| Over-squashing | 과압축 | 먼 이웃의 정보가 고정된 크기의 벡터로 눌려 전달되지 못하는 현상 | 12 |
-| Weisfeiler–Lehman test | WL 검정 | GNN의 표현력 한계를 규정하는 그래프 동형 판별 절차 | 12 |
-| Graph transformer | 그래프 트랜스포머 | 트랜스포머의 어텐션을 그래프로 가져오고 구조는 위치·구조 인코딩으로 넣는 계열 | 13 |
-| Positional encoding | 위치 인코딩 | 노드가 그래프의 어디에 있는지 알려주는 추가 입력 (예: 라플라시안 고유벡터) | 13 |
-| Heterogeneous graph | 이종 그래프 | 노드·엣지의 종류가 여럿인 그래프 (약물–표적–질병) | 13 |
-| Knowledge graph | 지식 그래프 | (개체, 관계, 개체) 사실들을 모은 이종 그래프 | 13 |
-| Relational deep learning | 관계형 딥러닝 | 관계형 DB의 행을 노드, 테이블 간 키를 엣지로 보고 직접 학습 | 13 |
-| Foundation model | 파운데이션 모델 | 대규모 데이터로 사전학습해 여러 과제에 맞춰 쓰는 모델 | 13 |
-| Zero-shot | 제로샷 | 해당 과제·그래프로 추가 학습하지 않고 바로 적용하는 평가 | 13 |
-| Diffusion model | 확산 모델 | 노이즈를 조금씩 걷어내며 샘플을 생성하는 모델 | 13 |
-| Circular analysis | 순환 분석 | 라벨을 만든 재료(그래프)로 그 라벨을 다시 예측하는 것 | 13 |
+| Perceptron | 퍼셉트론 | 가중합에 비선형을 씌운 최소 단위 | [08 §1-1](08_nn_basics.qmd#c08-s1-1) |
+| Activation function | 활성함수 | 비선형을 넣는 함수 (ReLU 등) | [08 §2](08_nn_basics.qmd#c08-s2) |
+| Backpropagation | 역전파 | 연쇄법칙으로 기울기를 거슬러 계산 | [08 §3](08_nn_basics.qmd#c08-s3) |
+| Multilayer perceptron (MLP) | 다층 퍼셉트론 | 은닉층을 하나 이상 둔 완전연결 신경망 | [08 §1-1](08_nn_basics.qmd#c08-s1-1) |
+| Loss function | 손실 함수 | 예측이 얼마나 틀렸는지 재는 값 (MSE, cross-entropy) | [08 §2-3](08_nn_basics.qmd#c08-s2-3) |
+| Logit | 로짓 | sigmoid·softmax를 거치기 전의 출력값 | [08 §2-3](08_nn_basics.qmd#c08-s2-3) |
+| Gradient descent | 경사하강법 | 손실이 줄어드는 방향으로 가중치를 조금씩 옮기는 방법 | [08 §3](08_nn_basics.qmd#c08-s3) |
+| Learning rate | 학습률 | 경사하강에서 한 번에 움직이는 크기 η | [08 §3-1](08_nn_basics.qmd#c08-s3-1) |
+| Vanishing gradient | 기울기 소실 | 입력 쪽 층으로 갈수록 기울기가 0에 가까워지는 현상 | [08 §2-2](08_nn_basics.qmd#c08-s2-2) |
+| Dead ReLU | 죽은 뉴런 | 모든 입력에서 0을 내어 더 이상 학습되지 않는 ReLU 뉴런 | [08 §2-1](08_nn_basics.qmd#c08-s2-1) |
+| He initialization | He 초기화 | ReLU 망에 맞춘 가중치 초기화 (분산 2/n) | [08 §2-2](08_nn_basics.qmd#c08-s2-2) |
+| Universal approximation theorem | 보편 근사 정리 | 은닉층 하나로도 연속함수를 근사할 수 있다는 정리 — 학습과 일반화는 보장하지 않음 | [08 §4-2](08_nn_basics.qmd#c08-s4-2) |
+| Overfitting | 과적합 | 학습 데이터만 잘 맞추는 상태 | [09 §2](09_training.qmd#c09-s2) |
+| Regularization | 정규화 | 과적합을 막는 장치 (dropout, weight decay) | [09 §2](09_training.qmd#c09-s2) |
+| Train / validation / test | 학습 / 검증 / 시험 데이터 | 학습용, 고르기용, 최종 보고용 (한 번만) | [09 §1-1](09_training.qmd#c09-s1-1) |
+| Data leakage | 데이터 누수 | test의 정보가 학습·선택 과정에 새어 들어가는 것 | [09 §1-2](09_training.qmd#c09-s1-2) |
+| Nested CV | 중첩 교차검증 | 모델을 고르는 CV를 바깥 CV로 한 번 더 감싸는 방법 | [09 §1-1](09_training.qmd#c09-s1-1) |
+| Early stopping | 조기 종료 | validation loss가 최저일 때 학습을 멈춤 | [09 §2-2](09_training.qmd#c09-s2-2) |
+| Weight decay | 가중치 감쇠 | 가중치 크기에 벌점을 주는 정규화 | [09 §2-2](09_training.qmd#c09-s2-2) |
+| Dropout | 드롭아웃 | 학습 중 뉴런을 무작위로 끄는 정규화 | [09 §2-2](09_training.qmd#c09-s2-2) |
+| Elastic net | — | L1과 L2 규제를 섞은 선형 모델 | [09 §2-1](09_training.qmd#c09-s2-1) |
+| Balanced accuracy | 균형 정확도 | 클래스별 재현율의 평균 — 불균형 데이터용 | [09 §3-1](09_training.qmd#c09-s3-1) |
+| Batch effect | 배치 효과 | 처리 날짜·lane·기관 같은 기술적 차이가 데이터에 남긴 흔적 | [09 §4](09_training.qmd#c09-s4) |
+| Shortcut learning | 지름길 학습 | 라벨과 우연히 얽힌 신호로 정답을 맞히는 것 | [09 §4-1](09_training.qmd#c09-s4-1) |
+| Pseudoreplication | 유사반복 | 독립이 아닌 관측(같은 환자의 세포)을 독립으로 세는 것 | [09 §1-3](09_training.qmd#c09-s1-3) |
+| Inductive bias | 귀납 편향 | 데이터를 보기 전에 모델 구조에 넣어둔 가정 | [10 §1-1](10_architectures.qmd#c10-s1-1) |
+| Convolutional neural network (CNN) | 합성곱 신경망 | 같은 필터를 위치마다 밀며 적용하는 신경망 — 학습되는 PWM 스캐너 | [10 §1](10_architectures.qmd#c10-s1) |
+| Weight sharing | 가중치 공유 | 모든 위치에 같은 파라미터를 쓰는 것 | [10 §1-2](10_architectures.qmd#c10-s1-2) |
+| Pooling | 풀링 | 여러 위치의 반응을 최댓값·평균 하나로 요약 — 위치 정보를 버림 | [10 §1-2](10_architectures.qmd#c10-s1-2) |
+| Recurrent neural network (RNN), LSTM | 순환 신경망 | 서열을 한 칸씩 읽으며 은닉 상태를 갱신하는 구조 | [10 §1-5](10_architectures.qmd#c10-s1-5) |
+| Autoencoder | 오토인코더 | 압축했다 복원하며 표현을 배우는 구조 | [10 §2](10_architectures.qmd#c10-s2) |
+| Latent space | 잠재 공간 | 압축된 표현이 사는 저차원 공간 | [10 §2-1](10_architectures.qmd#c10-s2-1) |
+| Variational autoencoder (VAE) | 변분 오토인코더 | 잠재를 점이 아니라 분포로 두는 오토인코더 — scVI의 뼈대 | [10 §2](10_architectures.qmd#c10-s2) |
+| Attention | 어텐션 | 어디를 볼지 가중치로 배우는 방식 | [10 §3](10_architectures.qmd#c10-s3) |
+| Transformer, self-attention | 트랜스포머, 자기 어텐션 | 모든 위치 쌍 사이의 어텐션을 층으로 쌓은 구조 | [10 §3-1](10_architectures.qmd#c10-s3-1) |
+| Node embedding | 노드 임베딩 | 노드를 벡터로 바꾼 것 | [11 §1-1](11_node_embedding.qmd#c11-s1-1) |
+| Encoder–decoder | 인코더–디코더 | 노드를 벡터로 보내고(encoder), 두 벡터의 내적으로 유사도를 재현(decoder)하는 틀 | [11 §1-2](11_node_embedding.qmd#c11-s1-2) |
+| Shallow embedding | 얕은 임베딩 | 노드마다 벡터를 따로 두는 표 조회식 encoder | [11 §1-2](11_node_embedding.qmd#c11-s1-2) |
+| word2vec, skip-gram | — | 가까이 함께 나오는 단어(노드)를 비슷한 벡터로 학습하는 얕은 신경망 | [11 §2-1](11_node_embedding.qmd#c11-s2-1) |
+| Negative sampling | 음성 샘플링 | 무작위로 뽑은 쌍을 "비슷하지 않은 쌍"으로 써서 학습하는 방법 | [11 §2-1](11_node_embedding.qmd#c11-s2-1) |
+| DeepWalk | — | 균일한 랜덤워크 + word2vec 노드 임베딩 | [11 §2](11_node_embedding.qmd#c11-s2) |
+| node2vec | — | p·q로 성향을 준 랜덤워크 + word2vec 노드 임베딩 | [11 §2](11_node_embedding.qmd#c11-s2) |
+| Structural equivalence (role) | 구조적 동등성 (역할) | 멀리 있어도 연결 구조의 모양이 같은 노드 | [11 §1-2](11_node_embedding.qmd#c11-s1-2) |
+| Transductive / inductive | 전이적 / 귀납적 | 새 노드에 적용 불가 / 가능 | [11 §4-1](11_node_embedding.qmd#c11-s4-1) |
+| Message passing | 메시지 전달 | 이웃 정보를 모아 노드를 갱신하는 GNN의 핵심 연산 | [12 §1](12_gnn.qmd#c12-s1) |
+| Aggregate / update | 집계 / 갱신 | 이웃을 순서와 무관한 함수로 모으고, 학습되는 W로 내 표현을 새로 만드는 두 단계 | [12 §1-2](12_gnn.qmd#c12-s1-2) |
+| Permutation invariance | 순열 불변성 | 이웃의 순서를 바꿔도 결과가 같은 성질 | [12 §1-1](12_gnn.qmd#c12-s1-1) |
+| GCN / GraphSAGE / GAT | — | 이웃을 집계하는 세 가지 방식 (평균 / 나 자신을 따로 / 어텐션) | [12 §2](12_gnn.qmd#c12-s2) |
+| GIN | — | 합으로 집계해 1-WL 검정만큼 구별하는 GNN | [12 §2-1](12_gnn.qmd#c12-s2-1) |
+| SGC | — | 비선형을 빼고 Â^K X 에 선형 모델 하나만 얹은 GNN | [12 §1-3](12_gnn.qmd#c12-s1-3) |
+| Homophily / heterophily | 동종친화 / 이종친화 | 이웃끼리 같은 부류인 정도가 높은 / 낮은 그래프 | [12 §3-3](12_gnn.qmd#c12-s3-3) |
+| Over-smoothing | 과평활화 | 층을 쌓을수록 모든 노드가 같아지는 현상 | [12 §3-1](12_gnn.qmd#c12-s3-1) |
+| Over-squashing | 과압축 | 먼 이웃의 정보가 고정된 크기의 벡터로 눌려 전달되지 못하는 현상 | [12 §3-2](12_gnn.qmd#c12-s3-2) |
+| Weisfeiler–Lehman test | WL 검정 | GNN의 표현력 한계를 규정하는 그래프 동형 판별 절차 | [12 §3-4](12_gnn.qmd#c12-s3-4) |
+| Graph transformer | 그래프 트랜스포머 | 트랜스포머의 어텐션을 그래프로 가져오고 구조는 위치·구조 인코딩으로 넣는 계열 | [13 §2-1](13_frontiers.qmd#c13-s2-1) |
+| Positional encoding | 위치 인코딩 | 노드가 그래프의 어디에 있는지 알려주는 추가 입력 (예: 라플라시안 고유벡터) | [13 §2-1](13_frontiers.qmd#c13-s2-1) |
+| Heterogeneous graph | 이종 그래프 | 노드·엣지의 종류가 여럿인 그래프 (약물–표적–질병) | [13 §2-1](13_frontiers.qmd#c13-s2-1) |
+| Knowledge graph | 지식 그래프 | (개체, 관계, 개체) 사실들을 모은 이종 그래프 | [13 §1-1](13_frontiers.qmd#c13-s1-1) |
+| Relational deep learning | 관계형 딥러닝 | 관계형 DB의 행을 노드, 테이블 간 키를 엣지로 보고 직접 학습 | [13 §2-1](13_frontiers.qmd#c13-s2-1) |
+| Foundation model | 파운데이션 모델 | 대규모 데이터로 사전학습해 여러 과제에 맞춰 쓰는 모델 | [13 §1-2](13_frontiers.qmd#c13-s1-2) |
+| Zero-shot | 제로샷 | 해당 과제·그래프로 추가 학습하지 않고 바로 적용하는 평가 | [13 §1-2](13_frontiers.qmd#c13-s1-2) |
+| Diffusion model | 확산 모델 | 노이즈를 조금씩 걷어내며 샘플을 생성하는 모델 | [13 §2-2](13_frontiers.qmd#c13-s2-2) |
+| Circular analysis | 순환 분석 | 라벨을 만든 재료(그래프)로 그 라벨을 다시 예측하는 것 | [13 §3-2](13_frontiers.qmd#c13-s3-2) |
