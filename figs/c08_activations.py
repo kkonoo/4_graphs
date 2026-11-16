@@ -1,21 +1,21 @@
 """08 §2 — 활성함수와 기울기 소실.
 
-왼쪽: 활성함수 3종. 가운데: 그 도함수 (sigmoid 최대 0.25).
-오른쪽: 은닉 10층 MLP에서 층별 가중치 기울기 크기 (실측, 시드 20개 평균).
+왼쪽 위: 활성함수 3종. 왼쪽 아래: 그 도함수 (sigmoid 최대 0.25).
+오른쪽: 은닉 10층 MLP에서 층별 가중치 기울기 크기 (실측, 시드 20개 기하평균).
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from style import *
+from medfig import *
 import torch
 import torch.nn as nn
-
-OUT = outdir("c08")
+from matplotlib.ticker import FuncFormatter
 
 z = np.linspace(-5, 5, 400)
 sig = 1 / (1 + np.exp(-z))
-acts = {"sigmoid": (sig, sig * (1 - sig), ORANGE),
-        "tanh": (np.tanh(z), 1 - np.tanh(z) ** 2, PURPLE),
-        "ReLU": (np.maximum(z, 0), (z > 0).astype(float), TEAL)}
+C_SIG, C_TANH, C_RELU = CAT[0], CAT[1], CAT[2]      # 나란한 세 활성함수
+acts = {"sigmoid": (sig, sig * (1 - sig), C_SIG),
+        "tanh": (np.tanh(z), 1 - np.tanh(z) ** 2, C_TANH),
+        "ReLU": (np.maximum(z, 0), (z > 0).astype(float), C_RELU)}
 
 # ── 층별 기울기 실측 ─────────────────────────────────────────────────
 DEPTH, WIDTH, BATCH, SEEDS = 10, 64, 256, 20
@@ -52,31 +52,62 @@ for name, act, he in [("sigmoid", nn.Sigmoid, False), ("tanh", nn.Tanh, False),
 
 print("0.25^10 =", 0.25 ** 10)
 
-fig, axes = plt.subplots(1, 3, figsize=(15.5, 4.3),
-                         gridspec_kw={"width_ratios": [1, 1, 1.25]})
+# ── 그림 ────────────────────────────────────────────────────────────
+plt.rcParams.update({"xtick.labelsize": 11, "ytick.labelsize": 11})
+fig = plt.figure(figsize=(8.4, 5.3))
+gs = fig.add_gridspec(2, 2, width_ratios=[1, 1.45], hspace=0.62, wspace=0.3)
+ax1 = fig.add_subplot(gs[0, 0])
+ax2 = fig.add_subplot(gs[1, 0])
+ax3 = fig.add_subplot(gs[:, 1])
+
+minus = FuncFormatter(lambda v, p: f"{v:g}".replace("-", "\u2212"))
+
+def marker(ax, text, y=1.06):
+    ax.text(0, y, text, transform=ax.transAxes, ha="left", va="bottom",
+            fontsize=12, fontweight="bold", color=TEXT)
+
+# ① 활성함수
 for name, (f, d, c) in acts.items():
-    axes[0].plot(z, f, color=c, lw=2.2, label=name)
-    axes[1].plot(z, d, color=c, lw=2.2, label=name)
-axes[0].set_ylim(-1.2, 3); axes[0].axhline(0, color=LGREY, lw=0.8, zorder=0)
-axes[0].set_title("활성함수", color=NAVY); axes[0].set_xlabel("z")
-axes[0].legend(frameon=False, loc="upper left")
-axes[1].axhline(0.25, color=ORANGE, ls="--", lw=1)
-axes[1].text(-4.9, 0.29, "sigmoid 최대 0.25", color=ORANGE, fontsize=10)
-axes[1].set_title("도함수 (기울기가 통과하는 비율)", color=NAVY)
-axes[1].set_xlabel("z"); axes[1].set_ylim(-0.05, 1.1)
+    ax1.plot(z, f, color=c, lw=2.2, zorder=3)
+    ax2.plot(z, d, color=c, lw=2.2, zorder=3)
+ax1.axhline(0, color=LINE, lw=0.9, zorder=0)
+ax1.set_ylim(-1.2, 3); ax1.set_yticks([-1, 0, 1, 2, 3])
+ax1.set_xticks([-4, -2, 0, 2, 4])
+ax1.xaxis.set_major_formatter(minus); ax1.yaxis.set_major_formatter(minus)
+ax1.set_xlabel("z", fontsize=11.5, labelpad=2)
+ax1.text(2.0, 2.5, "ReLU", color=C_RELU, fontsize=11.5, fontweight="bold", ha="right", va="center")
+ax1.text(-4.8, -0.8, "tanh", color=C_TANH, fontsize=11.5, fontweight="bold", ha="left", va="bottom")
+ax1.text(-1.2, 0.62, "sigmoid", color=C_SIG, fontsize=11.5, fontweight="bold", ha="right", va="center")
+marker(ax1, "① 활성함수")
 
-ax = axes[2]
+# ② 도함수
+ax2.axhline(0.25, color=ACCENT_INK, ls=(0, (4, 2.5)), lw=1.3, zorder=2)
+ax2.text(4.95, 0.31, "sigmoid\n최대 0.25", color=ACCENT_INK, fontsize=11, fontweight="bold",
+         ha="right", va="bottom", linespacing=1.15)
+ax2.set_ylim(-0.05, 1.1); ax2.set_yticks([0, 0.5, 1.0])
+ax2.set_xticks([-4, -2, 0, 2, 4])
+ax2.xaxis.set_major_formatter(minus)
+ax2.set_xlabel("z", fontsize=11.5, labelpad=2)
+marker(ax2, "② 도함수 (기울기 통과 비율)")
+
+# ③ 층별 기울기
 L = np.arange(1, DEPTH + 2)
-for name, c, ls in [("sigmoid", ORANGE, "-"), ("tanh", PURPLE, "-"),
-                    ("ReLU", TEAL, "-"), ("ReLU + He 초기화", NAVY, "--")]:
-    ax.plot(L, res[name], "o", ls=ls, color=c, lw=2, ms=5, label=name)
-ax.set_yscale("log")
-ax.set_xticks(L); ax.set_xticklabels([str(i) for i in L[:-1]] + ["출력"])
-ax.set_xlabel("층 (입력 쪽 → 출력 쪽)")
-ax.set_ylabel("가중치 기울기 크기  ‖∂L/∂W‖")
-ax.set_title(f"은닉 {DEPTH}층 MLP의 층별 기울기 (실측)", color=NAVY)
-ax.legend(frameon=False)
+ax3.grid(axis="y", color=LINE, lw=0.7, zorder=0)
+for name, c, ls in [("sigmoid", C_SIG, "-"), ("tanh", C_TANH, "-"),
+                    ("ReLU", C_RELU, "-"), ("ReLU + He 초기화", C_RELU, (0, (4, 2.5)))]:
+    ax3.plot(L, res[name], "o", ls=ls, color=c, lw=2, ms=4.5, zorder=3)
+ax3.set_yscale("log")
+ax3.set_ylim(1.5e-10, 6)
+ax3.set_xlim(0.5, 11.5)
+ax3.set_xticks(L); ax3.set_xticklabels([str(i) for i in L[:-1]] + ["출력"])
+ax3.set_xlabel("층 (입력 쪽 → 출력 쪽)", fontsize=11.5)
+ax3.set_ylabel("가중치 기울기 크기  ‖∂L/∂W‖", fontsize=11.5)
+kw = dict(fontsize=11.5, fontweight="bold", ha="left")
+ax3.text(1.0, 0.05, "ReLU + He 초기화", color=C_RELU, va="top", **kw)
+ax3.text(1.0, 1.6e-3, "tanh", color=C_TANH, va="bottom", **kw)
+ax3.text(1.0, 7e-6, "ReLU", color=C_RELU, va="top", **kw)
+ax3.text(2.4, 1.5e-9, "sigmoid", color=C_SIG, va="top", **kw)
+# taller axes: smaller relative offset keeps the marker level with ①
+marker(ax3, f"③ 은닉 {DEPTH}층 MLP의 층별 기울기", y=1.028)
 
-fig.tight_layout()
-fig.savefig(os.path.join(OUT, "activations.png"))
-print("wrote", os.path.join(OUT, "activations.png"))
+save(fig, img("c08", "activations.png"))
