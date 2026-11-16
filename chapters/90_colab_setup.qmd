@@ -1,5 +1,5 @@
 ---
-title: "90. Colab 환경 설정"
+title: "A. Colab 환경 설정"
 description: "실습 환경, 패키지, 데이터셋"
 author: "Eunji Ha"
 date: today
@@ -8,7 +8,7 @@ format:
   html:
     include-in-header:
       text: |
-        <meta name="ai-title" content="90. Colab 환경 설정">
+        <meta name="ai-title" content="A. Colab 환경 설정">
         <meta name="ai-context" content="
         이 강의의 실습은 모두 Google Colab에서 실행합니다. 로컬 설치는 필요 없습니다.
         Part 1(그래프)에 필요한 networkx, numpy, pandas, matplotlib, scipy는 Colab에

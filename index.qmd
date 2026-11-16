@@ -52,7 +52,7 @@ format:
 모든 챕터 끝에 접힌 **🐍 실습** 블록이 있습니다.
 
 -   하나도 펼치지 않고 강의 전체를 읽어도 됩니다
--   전부 **Google Colab**에서 돌아가며 설치할 것이 없습니다 → [90. Colab 환경 설정](chapters/90_colab_setup.qmd)
+-   전부 **Google Colab**에서 돌아가며 설치할 것이 없습니다 → [A. Colab 환경 설정](chapters/90_colab_setup.qmd)
 -   Part 1은 `networkx`·`igraph`, Part 2는 `PyTorch`·`PyTorch Geometric`을 씁니다
 :::
 

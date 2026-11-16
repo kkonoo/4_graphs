@@ -235,7 +235,7 @@ $$p_{t+1} = \alpha \, W p_t + (1-\alpha)\, p_0$$
 ::: {.callout-tip collapse="true"}
 ## 🐍 실습 — RWR로 후보 유전자 우선순위 매기고, 차수 편향 점검하기
 
-Colab에서 실행합니다. 설치는 [90. Colab 환경 설정](90_colab_setup.qmd) 참고.
+Colab에서 실행합니다. 설치는 [A. Colab 환경 설정](90_colab_setup.qmd) 참고.
 
 ```python
 import numpy as np, pandas as pd, networkx as nx

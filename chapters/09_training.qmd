@@ -189,7 +189,7 @@ format:
 ::: {.callout-tip collapse="true"}
 ## 🐍 실습 — 유방암 아형 분류: elastic net · 랜덤 포레스트 · MLP를 같은 조건에서
 
-Colab에서 실행합니다. 설치는 [90. Colab 환경 설정](90_colab_setup.qmd) 참고. 발현 파일이 약 150 MB이고, 전체 실행에 몇 분 걸립니다.
+Colab에서 실행합니다. 설치는 [A. Colab 환경 설정](90_colab_setup.qmd) 참고. 발현 파일이 약 150 MB이고, 전체 실행에 몇 분 걸립니다.
 
 ```python
 import warnings; warnings.filterwarnings("ignore")

@@ -79,9 +79,9 @@ website:
             href: chapters/13_frontiers.qmd
       - section: "부록"
         contents:
-          - text: "90. Colab 환경 설정"
+          - text: "A. Colab 환경 설정"
             href: chapters/90_colab_setup.qmd
-          - text: "91. 용어집"
+          - text: "B. 용어집"
             href: chapters/91_glossary.qmd
 
   page-footer:

@@ -180,7 +180,7 @@ $$Z = \frac{\text{관측값} - \text{null 평균}}{\text{null 표준편차}}$$
 ::: {.callout-tip collapse="true"}
 ## 🐍 실습 — 내 네트워크 지표에 Z-score 붙이기
 
-Colab에서 실행합니다. 설치는 [90. Colab 환경 설정](90_colab_setup.qmd) 참고.
+Colab에서 실행합니다. 설치는 [A. Colab 환경 설정](90_colab_setup.qmd) 참고.
 
 ```python
 import numpy as np, pandas as pd, networkx as nx

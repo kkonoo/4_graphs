@@ -126,7 +126,7 @@ $$
 ::: {.callout-tip collapse="true"}
 ## 🐍 실습 — PyG 2.x로 Cora: 로지스틱 회귀 · MLP · GCN · GAT를 같은 split에서
 
-Colab에서 실행합니다. `!pip install -q torch-geometric` 먼저 ([90. Colab 환경 설정](90_colab_setup.qmd)). CPU에서는 GAT 때문에 몇 분 걸립니다.
+Colab에서 실행합니다. `!pip install -q torch-geometric` 먼저 ([A. Colab 환경 설정](90_colab_setup.qmd)). CPU에서는 GAT 때문에 몇 분 걸립니다.
 
 ⚠️ **예전 PyG 1.x 노트북을 그대로 쓰지 마세요**
 

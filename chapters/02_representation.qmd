@@ -185,7 +185,7 @@ format:
 ::: {.callout-tip collapse="true"}
 ## 🐍 실습 — STRING 네트워크를 읽고 구조 파악하기
 
-Colab에서 실행합니다. 설치는 [90. Colab 환경 설정](90_colab_setup.qmd) 참고.
+Colab에서 실행합니다. 설치는 [A. Colab 환경 설정](90_colab_setup.qmd) 참고.
 
 ```python
 import pandas as pd, numpy as np, networkx as nx

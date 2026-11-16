@@ -181,7 +181,7 @@ Part 1 전체가 결국 이 목록으로 수렴합니다.
 ::: {.callout-tip collapse="true"}
 ## 🐍 실습 — STRING에서 받아 Cytoscape까지, 재현 가능하게
 
-Colab에서 실행합니다. 설치는 [90. Colab 환경 설정](90_colab_setup.qmd) 참고.
+Colab에서 실행합니다. 설치는 [A. Colab 환경 설정](90_colab_setup.qmd) 참고.
 
 ```python
 import requests, io, json, datetime

@@ -166,7 +166,7 @@ GNN 논문(또는 자기 원고)에서 성능 숫자를 보면, 결론을 읽기
 ::: {.callout-tip collapse="true"}
 ## 🐍 실습 — PBMC 3k: 세포 kNN 그래프 → PyG → GCN, 그리고 baseline 둘
 
-Colab에서 실행합니다. `!pip install -q scanpy torch-geometric python-igraph leidenalg` 먼저 ([90. Colab 환경 설정](90_colab_setup.qmd)). 1–2분 걸립니다.
+Colab에서 실행합니다. `!pip install -q scanpy torch-geometric python-igraph leidenalg` 먼저 ([A. Colab 환경 설정](90_colab_setup.qmd)). 1–2분 걸립니다.
 
 ```python
 import warnings; warnings.filterwarnings("ignore")

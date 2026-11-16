@@ -198,7 +198,7 @@ Zachary karate club에서:
 ::: {.callout-tip collapse="true"}
 ## 🐍 실습 — 중심성 비교표 만들고 순위가 얼마나 흔들리는지 보기
 
-Colab에서 실행합니다. 설치는 [90. Colab 환경 설정](90_colab_setup.qmd) 참고.
+Colab에서 실행합니다. 설치는 [A. Colab 환경 설정](90_colab_setup.qmd) 참고.
 
 ```python
 import numpy as np, pandas as pd, networkx as nx

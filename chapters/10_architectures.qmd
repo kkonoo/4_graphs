@@ -264,7 +264,7 @@ for f in W.norm(dim=(1, 2)).argsort(descending=True)[:3]:
 ::: {.callout-tip collapse="true"}
 ## 🐍 실습 2 — PBMC 3k: PCA와 오토인코더를 숫자로 비교
 
-Colab에서 실행합니다. `!pip install -q scanpy` 먼저 ([90. Colab 환경 설정](90_colab_setup.qmd)). 1분 안쪽으로 끝납니다.
+Colab에서 실행합니다. `!pip install -q scanpy` 먼저 ([A. Colab 환경 설정](90_colab_setup.qmd)). 1분 안쪽으로 끝납니다.
 
 ```python
 import warnings; warnings.filterwarnings("ignore")
