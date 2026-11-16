@@ -153,37 +153,7 @@ if __name__ == "__main__":
         pd.DataFrame([dict(coord_abs_r=coord, pair_cos_r=sim, kmeans_ari=agree)]).to_csv(f4, index=False)
         print("seed:", round(coord, 3), round(sim, 3), round(agree, 3), flush=True)
 
-    # ── 그림 1: q가 걸음을 바꾼다 ─────────────────────────────────────
-    r = pd.read_csv(f1)
-    G, P = spatial_knn()
-    start = int(np.argmin(((P - 0.5) ** 2).sum(1)))
-    fig, axes = plt.subplots(1, 3, figsize=(15.5, 4.8), gridspec_kw={"width_ratios": [1, 1, 1.25]})
-    for ax, q, c in [(axes[0], 0.25, PURPLE), (axes[1], 4, TEAL)]:
-        for u, v in G.edges():
-            ax.plot(*P[[u, v]].T, color=LGREY, lw=0.6, zorder=1)
-        ax.scatter(*P.T, s=5, color=GREY, zorder=2)
-        rng = np.random.default_rng(1)
-        for k in range(3):                                # 같은 출발점에서 20걸음 x 3번
-            w = walks(G.subgraph(G.nodes), 1, q, n_walks=1, length=21, seed=10 + k)
-            w = [x for x in w if x[0] == start][0]
-            ax.plot(*P[w].T, color=c, lw=1.8, alpha=0.85, zorder=3)
-        ax.scatter(*P[start], s=90, color=NAVY, zorder=4, edgecolor="white")
-        h20 = r[(r.q == q) & (r.t == 20)].hop.iloc[0]
-        ax.set_title(f"q = {q}  →  20걸음 뒤 평균 {h20:.1f} hop", color=NAVY)
-        ax.set_xticks([]); ax.set_yticks([]); ax.set_aspect("equal")
-        for sp in ax.spines.values():
-            sp.set_visible(False)
-    ax = axes[2]
-    cols = {0.25: PURPLE, 0.5: BLUE, 1: GREY, 2: OLIVE, 4: TEAL}
-    for q, c in cols.items():
-        s_ = r[r.q == q]
-        ax.plot(s_.t, s_.hop, color=c, lw=2.3, marker="o", ms=3.5, label=f"q = {q}")
-    ax.set_xlabel("걸음 수 t"); ax.set_ylabel("출발점에서의 최단거리 (hop, 평균)")
-    ax.set_title("q가 작을수록 멀리 간다 (p = 1)", color=NAVY)
-    ax.legend(frameon=False, loc="upper left")
-    fig.tight_layout()
-    fig.savefig(os.path.join(OUT, "walks.png"))
-    print(r[r.t.isin([5, 10, 20])].pivot(index="t", columns="q", values="hop").round(2))
+    # 그림 1(walks.png)은 c11_walks.py가 그립니다 (실험 1의 캐시를 읽음).
 
     # ── 그림 2: 같은 뿌리 + p, q 재현 ────────────────────────────────
     d2, d3 = pd.read_csv(f2), pd.read_csv(f3)
