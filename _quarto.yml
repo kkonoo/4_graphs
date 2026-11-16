@@ -107,6 +107,7 @@ format:
 
     number-sections: false
     smooth-scroll: true
+    lightbox: auto
 
     # grid:
     #   sidebar-width: 400px
