@@ -73,7 +73,7 @@ format:
 
 **사영(projection)** — 한쪽 집단만의 그래프로 접는 것. "같은 경로에 있는 유전자끼리 연결"
 
-![왼쪽의 엣지 13개가 오른쪽에서 20개가 됩니다. 그중 15개는 경로 P3 하나에서 나온 clique입니다.](../images/c02/projection.png){fig-align="center"}
+![왼쪽의 엣지 13개가 오른쪽에서 20개가 됩니다. 그중 15개는 경로 P3 하나에서 나온 clique입니다(설명용 예).](../images/c02/projection.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## 사영은 정보를 잃고, 동시에 부풀립니다
@@ -93,7 +93,7 @@ format:
 
 ## 2. 표현 3종 📦 {#c02-s2}
 
-![같은 그래프를 세 가지로 담습니다. 내용은 같고 비용이 다릅니다.](../images/c02/representations.png){fig-align="center"}
+![같은 그래프를 세 가지로 담습니다. 내용은 같고 비용이 다릅니다. 인접 행렬(②)은 엣지 8개를 칸 64개에 담아 16개만 1입니다. 엣지 목록(③)과 인접 리스트(④)는 있는 연결만 적습니다. 유전자 8개로 만든 설명용 그래프입니다.](../images/c02/representations.png){fig-align="center"}
 
 ### 1) 무엇을 언제 쓰는가 {#c02-s2-1}
 
@@ -146,7 +146,7 @@ format:
 
 ## 3. 연결성 🔗 {#c02-s3}
 
-![왼쪽: 연결 요소·bridge·절단점. 오른쪽: 방향이 있으면 "연결"의 뜻이 둘로 갈라집니다.](../images/c02/connectivity.png){fig-align="center"}
+![왼쪽: 연결 요소·bridge·절단점(진한 보라). 오른쪽: 방향이 있으면 "연결"의 뜻이 둘로 갈라집니다. 방향을 지우면 한 덩어리지만, 같은 색으로 묶인 SCC는 3개입니다. 설명용 그래프입니다.](../images/c02/connectivity.png){fig-align="center"}
 
 ### 1) 연결 요소와 거대 요소 {#c02-s3-1}
 
