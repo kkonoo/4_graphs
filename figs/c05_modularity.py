@@ -4,11 +4,9 @@
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from style import *
+from medfig import *
 import networkx as nx
 from networkx.algorithms.community import modularity
-
-OUT = outdir("c05")
 
 n_comm, size, p_in, p_out = 4, 30, 0.22, 0.012
 sizes = [size] * n_comm
@@ -24,31 +22,24 @@ random_part = [set(np.array(G.nodes())[rand_lab == c]) for c in range(n_comm)]
 random_part = [s for s in random_part if s]
 one_part = [set(G.nodes())]
 
-palette = [TEAL, PURPLE, ORANGE, OLIVE, BLUE, RED]
+NEUTRAL = "#9AA1AB"                     # 나눔이 없음 = 한 가지 무채색
+cases = [("① 제대로 된 분할", truth, CAT),
+         ("② 무작위 분할", random_part, CAT),
+         ("③ 전부 한 덩어리", one_part, [NEUTRAL])]
 
-cases = [("제대로 된 분할", truth),
-         ("무작위 분할", random_part),
-         ("전부 한 덩어리", one_part)]
-
-fig, axes = plt.subplots(1, 3, figsize=(14.6, 5.0), gridspec_kw={"wspace": 0.05})
-for ax, (name, parts) in zip(axes, cases):
-    cmap = {}
-    for i, c in enumerate(parts):
-        for v in c:
-            cmap[v] = palette[i % len(palette)]
+fig, axes = plt.subplots(1, 3, figsize=(8.4, 3.5), gridspec_kw={"wspace": 0.06})
+for ax, (name, parts, pal) in zip(axes, cases):
+    cmap = {v: pal[i % len(pal)] for i, c in enumerate(parts) for v in c}
     Q = modularity(G, parts)
-    nx.draw_networkx_edges(G, pos, ax=ax, edge_color=LGREY, width=0.5)
-    nx.draw_networkx_nodes(G, pos, ax=ax,
-                           node_color=[cmap[v] for v in G.nodes()],
-                           linewidths=0, node_size=70)
-    ax.set_title(name, color=NAVY, fontsize=12)
-    ax.text(0.5, -0.03, f"Q = {Q:.3f}", transform=ax.transAxes, ha="center",
-            va="top", fontsize=13, fontweight="bold",
-            color=RED if Q < 0.1 else NAVY)
-    ax.margins(0.06); ax.set_axis_off()
+    nx.draw_networkx_edges(G, pos, ax=ax, edge_color=LINE, width=0.6)
+    nx.draw_networkx_nodes(G, pos, ax=ax, node_color=[cmap[v] for v in G.nodes()],
+                           linewidths=0, node_size=26)
+    ax.margins(0.04); ax.set_xticks([]); ax.set_yticks([])
+    for sp in ax.spines.values(): sp.set_visible(False)
+    ax.text(0.5, 1.02, name, transform=ax.transAxes, ha="center", va="bottom",
+            fontsize=12, fontweight="bold", color=TEXT)
+    ax.text(0.5, -0.02, f"Q = {Q:.3f}".replace("-", "−"), transform=ax.transAxes,
+            ha="center", va="top", fontsize=13, fontweight="bold", color=TEXT)
     print(f"{name:<14} 커뮤니티 {len(parts)}개  Q = {Q:.4f}")
 
-fig.suptitle("Q = (커뮤니티 안의 엣지 비율) − (우연이라면 기대되는 비율)",
-             color=NAVY, fontsize=13, fontweight="bold", y=1.02)
-fig.savefig(os.path.join(OUT, "modularity.png"))
-print("wrote", os.path.join(OUT, "modularity.png"))
+save(fig, img("c05", "modularity.png"))
