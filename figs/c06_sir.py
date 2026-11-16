@@ -5,10 +5,10 @@
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from style import *
+from medfig import *
 import networkx as nx
 
-OUT = outdir("c06")
+NEUTRAL = "#9AA1AB"
 
 G = nx.powerlaw_cluster_graph(600, 3, 0.3, seed=2)
 G = G.subgraph(max(nx.connected_components(G), key=len)).copy()
@@ -17,11 +17,12 @@ deg = dict(G.degree())
 btw = nx.betweenness_centrality(G)
 k = int(0.1 * N)
 
+# 제거 없음 = 기준선(무채색), 나머지 세 전략은 나란한 항목 → CAT
 strategies = [
-    ("제거 없음", [], NAVY),
-    ("무작위 10%", list(np.random.default_rng(1).choice(list(G.nodes()), k, replace=False)), BLUE),
-    ("차수 상위 10%", sorted(deg, key=deg.get, reverse=True)[:k], ORANGE),
-    ("매개 상위 10%", sorted(btw, key=btw.get, reverse=True)[:k], TEAL),
+    ("제거 없음", [], NEUTRAL),
+    ("무작위 10%", list(np.random.default_rng(1).choice(list(G.nodes()), k, replace=False)), CAT[1]),
+    ("차수 상위 10%", sorted(deg, key=deg.get, reverse=True)[:k], CAT[0]),
+    ("매개 상위 10%", sorted(btw, key=btw.get, reverse=True)[:k], CAT[2]),
 ]
 
 
@@ -50,33 +51,49 @@ def sir_curve(H, beta=0.06, gamma=0.1, n_seed=3, reps=60, tmax=120, seed=7):
     return curves.mean(0)
 
 
-fig, axes = plt.subplots(1, 2, figsize=(13.4, 4.7),
-                         gridspec_kw={"wspace": 0.26, "width_ratios": [1.25, 1]})
+plt.rcParams.update({"xtick.labelsize": 11, "ytick.labelsize": 11})
+fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.8),
+                         gridspec_kw={"wspace": 0.32, "width_ratios": [1.2, 1]})
 
-finals = []
+finals, curves = [], []
 for name, removed, col in strategies:
     H = G.copy(); H.remove_nodes_from(removed)
     c = sir_curve(H)
     finals.append((name, c[-1], col))
-    axes[0].plot(c, color=col, lw=2.2, label=f"{name}  (최종 {c[-1]:.2f})")
+    curves.append(c)
     print(f"  {name:<14} 최종 유행 규모 {c[-1]:.3f}")
+print(f"  노드 수 N = {N}, 제거 k = {k}")
 
-axes[0].set_xlabel("시간"); axes[0].set_ylabel("누적 감염 비율 (전체 대비)")
-axes[0].set_ylim(0, 1)
-axes[0].set_title("같은 10%를 빼도 누구를 빼느냐가 전부", color=NAVY, fontsize=12)
-axes[0].legend(frameon=False, fontsize=10)
+# ── ① 시간에 따른 누적 감염 ─────────────────────────────────────────
+ax = axes[0]
+for (name, _, col), c in zip(strategies, curves):
+    ax.plot(c, color=col, lw=2.2, zorder=3)
+lab_y = {"제거 없음": 0.865, "무작위 10%": 0.635, "매개 상위 10%": 0.185, "차수 상위 10%": 0.11}
+for name, _, col in strategies:
+    ax.text(118, lab_y[name], name, color=shade(col, 0.15) if col == NEUTRAL else col,
+            fontsize=11.5, fontweight="bold", ha="right", va="center")
+ax.set_xlabel("시간", fontsize=11.5)
+ax.set_ylabel("누적 감염 비율 (전체 대비)", fontsize=11.5)
+ax.set_ylim(0, 1); ax.set_xlim(-3, 122)
+ax.set_xticks([0, 20, 40, 60, 80, 100, 120])
+ax.grid(axis="y", color=LINE, lw=0.8, zorder=0)
+ax.text(0.0, 1.05, "① 시간에 따른 누적 감염", transform=ax.transAxes, ha="left", va="bottom",
+        fontsize=12.5, fontweight="bold", color=TEXT)
 
+# ── ② 전략별 최종 유행 규모 ─────────────────────────────────────────
 ax = axes[1]
-ax.bar([f[0].replace(" ", "\n") for f in finals], [f[1] for f in finals],
-       color=[f[2] for f in finals])
+ticklabs = ["제거\n없음", "무작위\n10%", "차수\n상위\n10%", "매개\n상위\n10%"]
+ax.bar(range(len(finals)), [f[1] for f in finals], color=[f[2] for f in finals], width=0.68, zorder=3)
 for i, f in enumerate(finals):
-    ax.text(i, f[1] + 0.02, f"{f[1]:.2f}", ha="center", fontsize=11,
-            fontweight="bold", color=f[2])
+    ax.text(i, f[1] + 0.025, f"{f[1]:.2f}", ha="center", va="bottom", fontsize=11.5,
+            fontweight="bold", color=TEXT)
+ax.set_xticks(range(len(finals)))
+ax.set_xticklabels(ticklabs, fontsize=11, linespacing=1.2, va="top")
+ax.tick_params(axis="x", length=0)
 ax.set_ylim(0, 1)
-ax.set_ylabel("최종 유행 규모")
-ax.set_title("노드 10% 제거 — 전략별 결과", color=NAVY, fontsize=12)
+ax.set_ylabel("최종 유행 규모", fontsize=11.5)
+ax.grid(axis="y", color=LINE, lw=0.8, zorder=0)
+ax.text(0.0, 1.05, "② 전략별 최종 유행 규모", transform=ax.transAxes, ha="left", va="bottom",
+        fontsize=12.5, fontweight="bold", color=TEXT)
 
-fig.suptitle(f"SIR 시뮬레이션 (노드 {N}, β=0.06, γ=0.1, 60회 평균)",
-             color=NAVY, fontsize=13, fontweight="bold", y=1.03)
-fig.savefig(os.path.join(OUT, "sir.png"))
-print("wrote", os.path.join(OUT, "sir.png"))
+save(fig, img("c06", "sir.png"))

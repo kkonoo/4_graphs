@@ -5,12 +5,11 @@ AUROC 는 그대로인데 AUPRC 는 무너진다.
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from style import *
+from medfig import *
 import networkx as nx
 from sklearn.metrics import (roc_curve, precision_recall_curve,
                              roc_auc_score, average_precision_score)
 
-OUT = outdir("c06")
 rng = np.random.default_rng(0)
 
 G = nx.powerlaw_cluster_graph(800, 3, 0.35, seed=1)
@@ -40,57 +39,78 @@ scorers = {
     "Adamic–Adar": lambda p: [s for _, _, s in nx.adamic_adar_index(H, p)],
     "Preferential Att.": lambda p: [s for _, _, s in nx.preferential_attachment(H, p)],
 }
-cols = {"Common Neighbors": BLUE, "Jaccard": PURPLE,
-        "Adamic–Adar": TEAL, "Preferential Att.": ORANGE}
+names = list(scorers)
+cols = {n: CAT[i] for i, n in enumerate(names)}      # 나란한 네 방법
+NEUTRAL = "#9AA1AB"
 
 settings = [("음성을 양성과 같은 수만 뽑으면", n_test),
             ("음성을 현실 비율대로 뽑으면 (1:50)", n_test * 50)]
+markers = ["① 음성을 양성과 같은 수만 (1:1)", "② 음성을 현실 비율대로 (1:50)"]
 
-fig, axes = plt.subplots(1, 3, figsize=(15.6, 4.7), gridspec_kw={"wspace": 0.28})
+plt.rcParams.update({"xtick.labelsize": 11, "ytick.labelsize": 11})
+fig = plt.figure(figsize=(8.4, 6.5))
+gs = fig.add_gridspec(2, 2, height_ratios=[1.4, 1], hspace=0.4, wspace=0.26)
+axes = [fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[0, 1]), fig.add_subplot(gs[1, :])]
 summary = {}
 
-for si, (label, n_neg) in enumerate(settings):
+for si, (lab, n_neg) in enumerate(settings):
     neg = sample_neg(n_neg)
     pairs = test_pos + neg
     y = np.r_[np.ones(len(test_pos)), np.zeros(len(neg))]
-    summary[label] = {}
+    summary[lab] = {}
     ax = axes[si]
     for name, f in scorers.items():
         s = np.array(f(pairs), dtype=float)
         pr, rc, _ = precision_recall_curve(y, s)
         ap = average_precision_score(y, s)
         auc = roc_auc_score(y, s)
-        summary[label][name] = (auc, ap)
-        ax.plot(rc, pr, color=cols[name], lw=1.8,
-                label=f"{name}  AUPRC={ap:.2f}")
-    ax.axhline(y.mean(), color=GREY, ls="--", lw=1.3,
-               label=f"우연 수준 {y.mean():.3f}")
-    ax.set_xlabel("Recall"); ax.set_ylabel("Precision")
-    ax.set_ylim(0, 1.02)
-    ax.set_title(label, color=NAVY, fontsize=12)
-    ax.legend(frameon=False, fontsize=9)
+        summary[lab][name] = (auc, ap)
+        ax.plot(rc, pr, color=cols[name], lw=1.8, label=f"{name}  {ap:.2f}")
+    chance_lab = f"우연 수준  {y.mean():.3f}"
+    ax.axhline(y.mean(), color=NEUTRAL, ls="--", lw=1.3,
+               label=(chance_lab if si == 1 else "_nolegend_"))
+    if si == 0:                                   # 범례와 겹치지 않게 점선 바로 위 왼쪽 빈 곳에 직접 라벨
+        ax.text(0.0, y.mean() + 0.025, chance_lab, fontsize=11, color=TEXT2,
+                ha="left", va="bottom")
+    ax.set_xlabel("Recall", fontsize=11.5); ax.set_ylabel("Precision", fontsize=11.5)
+    ax.set_ylim(0, 1.02); ax.set_xlim(-0.02, 1.02)
+    ax.text(0.5, 1.04, markers[si], transform=ax.transAxes, ha="center", va="bottom",
+            fontsize=12, fontweight="bold", color=TEXT)
+    if si == 0:
+        lk = dict(loc="lower right", bbox_to_anchor=(1.0, 0.0))
+    else:
+        lk = dict(loc="upper right", bbox_to_anchor=(1.0, 1.0))
+    ax.legend(frameon=False, fontsize=11, title="AUPRC", title_fontsize=11,
+              handlelength=1.3, labelspacing=0.25, borderaxespad=0.15, borderpad=0.2,
+              alignment="left", **lk)
 
-# --- 세 번째 패널: AUROC 는 그대로인데 AUPRC 만 무너진다 -------------------
+# --- ③ 요약: AUROC 는 그대로, AUPRC 만 무너진다 ---------------------------
 ax = axes[2]
-names = list(scorers)
-x = np.arange(len(names)); w = 0.2
+x = np.arange(len(names)); w = 0.19
 bal, real = settings[0][0], settings[1][0]
-ax.bar(x - 1.5*w, [summary[bal][n][0] for n in names], w, color=NAVY,
-       label="AUROC (균형)")
-ax.bar(x - 0.5*w, [summary[real][n][0] for n in names], w, color="#8FA3B0",
-       label="AUROC (현실)")
-ax.bar(x + 0.5*w, [summary[bal][n][1] for n in names], w, color=TEAL,
-       label="AUPRC (균형)")
-ax.bar(x + 1.5*w, [summary[real][n][1] for n in names], w, color=RED,
-       label="AUPRC (현실)")
-ax.set_xticks(x)
-ax.set_xticklabels([n.replace(" ", "\n") for n in names], fontsize=9)
-ax.set_ylim(0, 1)
-ax.set_title("⚠ AUROC는 꿈쩍 않고 AUPRC만 무너진다", color=NAVY, fontsize=12)
-ax.legend(frameon=False, fontsize=9, ncol=2)
+auc_b = [summary[bal][n][0] for n in names]
+auc_r = [summary[real][n][0] for n in names]
+ap_b = [summary[bal][n][1] for n in names]
+ap_r = [summary[real][n][1] for n in names]
+ax.bar(x - 1.5*w, auc_b, w, color="#5F6672", label="AUROC (균형)")   # 무채색: 위 네 방법의 색과 겹치지 않게
+ax.bar(x - 0.5*w, auc_r, w, color="#8B929D", label="AUROC (현실)")
+ax.bar(x + 0.5*w, ap_b, w, color="#BCC2CB", label="AUPRC (균형)")
+ax.bar(x + 1.5*w, ap_r, w, color=ACCENT, label="AUPRC (현실)")   # 놓치면 안 되는 하나
+for xi, v in zip(x, ap_r):
+    ax.text(xi + 1.5*w, v + 0.02, f"{v:.2f}", ha="center", va="bottom", fontsize=11,
+            fontweight="bold", color=ACCENT_INK)
+ax.set_xticks(x); ax.set_xticklabels(names, fontsize=11)
+ax.tick_params(axis="x", length=0)
+ax.set_ylim(0, 1.0); ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
+ax.set_ylabel("점수", fontsize=11.5)
+ax.yaxis.grid(True, color=LINE, lw=0.8); ax.set_axisbelow(True)
+ax.text(0.5, 1.04, "③ 네 방법 요약", transform=ax.transAxes, ha="center", va="bottom",
+        fontsize=12, fontweight="bold", color=TEXT)
+ax.legend(frameon=False, fontsize=11, ncol=4, loc="upper center",
+          bbox_to_anchor=(0.5, 1.01), handlelength=1.2, columnspacing=1.4)
 
-fig.savefig(os.path.join(OUT, "linkpred.png"))
-print("wrote", os.path.join(OUT, "linkpred.png"))
+save(fig, img("c06", "linkpred.png"))
+print(f"노드 {G.number_of_nodes()}  엣지 {G.number_of_edges()}  밀도 {nx.density(G):.4f}")
 for lab in summary:
     for n in names:
         a, p = summary[lab][n]
