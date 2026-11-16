@@ -1,25 +1,23 @@
 """04 §3 — 3-노드 모티프와 그 유의성.
 
-왼쪽: 방향 그래프에서 자주 이야기되는 3-노드 부분구조.
+왼쪽: 방향 그래프에서 자주 이야기되는 3-노드 부분구조 네 가지(2×2).
 오른쪽: 심어둔 feed-forward loop 가 방향 보존 재배선 null 대비 유의한가.
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from style import *
+from medfig import *
 import networkx as nx
 from itertools import combinations
 
-OUT = outdir("c04")
-
 # ── 모티프 도식 ───────────────────────────────────────────────────────
 shapes = [
-    ("Cascade\n(연쇄)", [("A", "B"), ("B", "C")]),
-    ("Feed-forward loop\n(FFL)", [("A", "B"), ("B", "C"), ("A", "C")]),
-    ("Feedback loop\n(되먹임)", [("A", "B"), ("B", "C"), ("C", "A")]),
-    ("Fan-out\n(공동 조절)", [("A", "B"), ("A", "C")]),
+    ("Cascade", "연쇄", [("A", "B"), ("B", "C")]),
+    ("Feed-forward loop", "FFL", [("A", "B"), ("B", "C"), ("A", "C")]),
+    ("Feedback loop", "되먹임", [("A", "B"), ("B", "C"), ("C", "A")]),
+    ("Fan-out", "공동 조절", [("A", "B"), ("A", "C")]),
 ]
 
-# ── FFL 을 심은 합성 조절 네트워크 ────────────────────────────────────
+# ── FFL 을 심은 합성 조절 네트워크 (old script verbatim) ───────────────
 rng = np.random.default_rng(7)
 n_genes, n_ffl, n_random = 80, 25, 160
 D = nx.DiGraph()
@@ -61,33 +59,65 @@ null = np.array(null)
 z = (obs - null.mean()) / null.std(ddof=1)
 p = (np.sum(null >= obs) + 1) / (N + 1)
 
-fig = plt.figure(figsize=(15.0, 4.6))
-gs = fig.add_gridspec(1, 5, width_ratios=[1, 1, 1, 1, 2.1], wspace=0.30)
+# ── 그림 ─────────────────────────────────────────────────────────────
+W, Hh = 8.4, 4.25
+fig = plt.figure(figsize=(W, Hh))
 
-for i, (name, edges) in enumerate(shapes):
-    ax = fig.add_subplot(gs[0, i])
-    g = nx.DiGraph(edges)
-    pos = {"A": (0, 1), "B": (-0.9, -0.6), "C": (0.9, -0.6)}
-    nx.draw_networkx_edges(g, pos, ax=ax, edge_color="#7C93A3", width=2.0,
-                           arrowsize=16, node_size=760,
-                           connectionstyle="arc3,rad=0.06")
-    nx.draw_networkx_nodes(g, pos, ax=ax, node_color=NAVY, linewidths=0,
-                           node_size=760)
-    nx.draw_networkx_labels(g, pos, ax=ax, font_size=11, font_color="white",
-                            font_weight="bold")
-    ax.set_title(name, color=NAVY, fontsize=11.5)
-    ax.margins(0.28); ax.set_axis_off()
+def inch_axes(x, y, w, h):
+    return fig.add_axes([x / W, y / Hh, w / W, h / Hh])
 
-ax = fig.add_subplot(gs[0, 4])
-ax.hist(null, bins=24, color=GREY, alpha=0.85, label=f"null (재배선 {N}회)")
-ax.axvline(obs, color=RED, lw=2.6, label="관측값")
-ax.axvline(null.mean(), color=NAVY, lw=1.4, ls="--", label="null 평균")
-ax.set_xlabel("FFL 개수"); ax.set_ylabel("빈도")
-ax.set_title(f"FFL 이 유의하게 많은가 — Z = {z:.1f}", color=NAVY, fontsize=12)
-ax.legend(frameon=False, fontsize=9.5)
+NODE, EDGE = PRIMARY, "#9AA1AB"
+R = 0.27
+pos = {"A": (0.0, 0.85), "B": (-0.85, -0.5), "C": (0.85, -0.5)}
+mw, mh = 1.75, 1.85
+xr = 2.6
+yr = xr * mh / mw
+slots = [(0.1, 2.05), (1.95, 2.05), (0.1, 0.1), (1.95, 0.1)]
+for (x0, y0), (name, sub, edges) in zip(slots, shapes):
+    ax = inch_axes(x0, y0, mw, mh)
+    ax.set_xlim(-xr / 2, xr / 2); ax.set_ylim(1.2 - yr, 1.2)
+    ax.set_aspect("equal")
+    ax.set_xticks([]); ax.set_yticks([])
+    for sp in ax.spines.values(): sp.set_visible(False)
+    ax.patch.set_alpha(0)
+    for s, t in edges:
+        p0, p1 = np.array(pos[s]), np.array(pos[t])
+        d = (p1 - p0) / np.linalg.norm(p1 - p0)
+        a0, a1 = p0 + d * (R + 0.03), p1 - d * (R + 0.04)
+        ax.add_patch(mp.FancyArrowPatch(tuple(a0), tuple(a1), arrowstyle="-|>", mutation_scale=14,
+                                        color=EDGE, lw=1.8, shrinkA=0, shrinkB=0, zorder=2))
+    for k, (x, y) in pos.items():
+        ax.add_patch(mp.Circle((x, y), R, fc=NODE, ec="none", zorder=3))
+        ax.text(x, y, k, ha="center", va="center", fontsize=11.5, fontweight="bold",
+                color=on(NODE), zorder=4)
+    ax.text(0, -0.9, name, ha="center", va="top", fontsize=11.5, fontweight="bold", color=TEXT)
+    ax.text(0, -1.23, sub, ha="center", va="top", fontsize=11, color=TEXT2)
 
-fig.savefig(os.path.join(OUT, "motifs.png"))
-print("wrote", os.path.join(OUT, "motifs.png"))
+fig.text(0.1 / W, 4.08 / Hh, "① 방향 그래프의 3-노드 패턴", ha="left", va="bottom",
+         fontsize=12.5, fontweight="bold", color=TEXT)
+
+# ── 히스토그램 ───────────────────────────────────────────────────────
+ax = inch_axes(4.55, 0.62, 3.7, 3.25)
+NULLC = STEPS[1]
+counts, _, _ = ax.hist(null, bins=24, color=NULLC, edgecolor="white", linewidth=0.4, zorder=2)
+hmax = counts.max()
+ax.set_ylim(0, hmax * 1.3)
+ax.set_xlim(null.min() - 2, obs + 3)
+ax.axvline(null.mean(), color=PRIMARY, lw=1.4, ls=(0, (4, 3)), zorder=3)
+ax.axvline(obs, color=ACCENT_INK, lw=2.4, zorder=3)
+ax.text(null.mean() + 0.8, hmax * 1.17, f"null 평균 {null.mean():.1f}", ha="left", va="center",
+        fontsize=11, color=PRIMARY, fontweight="bold")
+ax.text(37, hmax * 0.5, f"null 분포\n재배선 {N}회", ha="left", va="center", fontsize=11,
+        color=TEXT2, linespacing=1.35)
+ax.text(obs - 1.2, hmax * 1.0, f"관측 {obs}\nZ = {z:.1f}", ha="right", va="center", fontsize=11.5,
+        color=ACCENT_INK, fontweight="bold", linespacing=1.4)
+ax.set_xlabel("FFL 개수", fontsize=11.5)
+ax.set_ylabel("빈도", fontsize=11.5)
+ax.tick_params(labelsize=11)
+fig.text(4.25 / W, 4.08 / Hh, "② 심어둔 FFL은 유의하게 많은가", ha="left", va="bottom",
+         fontsize=12.5, fontweight="bold", color=TEXT)
+
+save(fig, img("c04", "motifs.png"))
 print(f"노드 {D.number_of_nodes()}, 엣지 {D.number_of_edges()}")
 print(f"관측 FFL {obs} | null 평균 {null.mean():.1f} ± {null.std(ddof=1):.1f} "
       f"| Z = {z:.2f} | p = {p:.4f}")
