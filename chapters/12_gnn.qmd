@@ -67,6 +67,8 @@ $$
 -   W는 **모든 노드가 공유**합니다 — 10의 가중치 공유를 그래프에 옮긴 것. 그래서 파라미터 수가 노드 수와 무관하고, 새 노드에도 바로 적용됩니다 (🔗 [11 §4](11_node_embedding.qmd#c11-s4)의 한계 해결)
 -   이 틀을 메시지 전달(message passing)이라 부릅니다 (Gilmer et al. 2017)
 
+![① 한 층에서 노드 v는 이웃의 표현을 모으고(aggregate), 자기 표현과 합쳐 새 표현을 만듭니다(update). ② 층을 하나 쌓을 때마다 보는 범위가 한 hop씩 넓어집니다. 설명용 그림입니다.](../images/c12/message_passing.png){fig-align="center"}
+
 ### 3) RWR에 학습을 끼우면 {#c12-s1-3}
 
 🔗 [06 §2](06_propagation.qmd#c06-s2)의 RWR과 GCN 층을 나란히 놓으면:
