@@ -1,4 +1,4 @@
-"""07 §2 — 연구 편향(study bias)이 만드는 가짜 허브.
+"""07 §2-1 — 연구 편향(study bias)이 만드는 가짜 허브.
 
 진짜 네트워크에는 허브가 하나도 없다(ER). 그런데 '많이 연구된 단백질일수록
 상호작용이 발견될 확률이 높다'는 규칙 하나만 넣으면, 관측된 네트워크는
@@ -6,11 +6,10 @@
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from style import *
+from medfig import *
 import networkx as nx
 from scipy.stats import spearmanr
 
-OUT = outdir("c07")
 rng = np.random.default_rng(0)
 
 n, m = 1000, 6000
@@ -31,49 +30,85 @@ deg_obs = np.array([G_obs.degree(v) for v in range(n)])
 rho_true = spearmanr(deg_obs, deg_true).statistic
 rho_eff = spearmanr(deg_obs, effort).statistic
 
-fig, axes = plt.subplots(1, 3, figsize=(15.4, 4.5), gridspec_kw={"wspace": 0.28})
+cv_true = deg_true.std() / deg_true.mean()
+cv_obs = deg_obs.std() / deg_obs.mean()
 
-# --- A. 차수 분포 (평균으로 나눠 같은 자에 놓고 비교) ----------------------
-ax = axes[0]
+# ── 색: 진짜 네트워크 · 관측 네트워크 · 연구량 (그림 안에서 같은 뜻 = 같은 색) ──
+C_TRUE, C_OBS, C_EFF = CAT[1], PRIMARY, CAT[2]
+
+plt.rcParams.update({"xtick.labelsize": 11, "ytick.labelsize": 11})
+fig = plt.figure(figsize=(8.4, 6.3))
+gs = fig.add_gridspec(2, 2, width_ratios=[1.75, 1], height_ratios=[1, 1.05],
+                      hspace=0.55, wspace=0.42)
+ax1 = fig.add_subplot(gs[0, :])
+ax2 = fig.add_subplot(gs[1, 0])
+ax3 = fig.add_subplot(gs[1, 1])
+
+def marker(ax, text):
+    ax.text(0.0, 1.06, text, transform=ax.transAxes, ha="left", va="bottom",
+            fontsize=12.5, fontweight="bold", color=TEXT)
+
+# --- ① 차수 분포 (평균으로 나눠 같은 자에 놓고 비교) ----------------------
+ax = ax1
 bins = np.linspace(0, 5, 34)
-ax.hist(deg_true / deg_true.mean(), bins=bins, color=BLUE, alpha=0.8,
-        label=f"진짜 (ER)  CV={deg_true.std()/deg_true.mean():.2f}")
-ax.hist(deg_obs / deg_obs.mean(), bins=bins, color=RED, alpha=0.7,
-        label=f"관측  CV={deg_obs.std()/deg_obs.mean():.2f}")
-ax.set_xlabel("차수 / 평균 차수"); ax.set_ylabel("노드 수")
-ax.set_title("없던 꼬리가 생긴다", color=NAVY, fontsize=12)
-ax.legend(frameon=False, fontsize=10)
+ax.hist(deg_obs / deg_obs.mean(), bins=bins, color=C_OBS, lw=0, zorder=2)
+# 진짜 분포는 윤곽선으로 — 값이 있는 구간만 그려 축 위를 덮지 않게
+h_true, _ = np.histogram(deg_true / deg_true.mean(), bins=bins)
+nz = np.nonzero(h_true)[0]
+lo, hi = nz.min(), nz.max() + 1
+ax.stairs(h_true[lo:hi], bins[lo:hi + 1], baseline=0, fill=False, color=C_TRUE, lw=2.2, zorder=3)
+ax.set_xlabel("차수 / 평균 차수", fontsize=11.5)
+ax.set_ylabel("노드 수", fontsize=11.5)
+ax.set_xlim(-0.1, 5.05); ax.set_ylim(0, 290)
+ax.text(2.25, 240, f"진짜 (ER)   CV = {cv_true:.2f}", color=C_TRUE, fontsize=11.5,
+        fontweight="bold", va="center")
+ax.text(2.25, 205, f"관측   CV = {cv_obs:.2f}", color=C_OBS, fontsize=11.5,
+        fontweight="bold", va="center")
+ax.annotate(f"없던 꼬리 · 최대 차수가 평균의 {deg_obs.max() / deg_obs.mean():.2f}배",
+            xy=(2.75, 38), xytext=(3.0, 120), fontsize=11, color=ACCENT_INK,
+            fontweight="bold", va="center",
+            arrowprops=dict(arrowstyle="-|>", color=ACCENT_INK, lw=1.2,
+                            connectionstyle="arc3,rad=0.2"))
+marker(ax, "① 차수 분포")
 
-# --- B. 관측 차수는 무엇을 따라가는가 --------------------------------------
-ax = axes[1]
+# --- ② 관측 차수는 무엇을 따라가는가 --------------------------------------
+ax = ax2
 # 차수가 정수라 점이 줄무늬로 겹칩니다 — 세로로 살짝 흔들어 표시합니다
 jit = rng.normal(0, 0.14, n)
-ax.scatter(effort, deg_obs + jit, s=8, color=RED, alpha=0.30)
+ax.scatter(effort, deg_obs + jit, s=8, color=mix(C_OBS, 0.55), alpha=0.45, lw=0, zorder=2)
 qs = np.quantile(effort, np.linspace(0, 1, 11))
 cx, cy = [], []
 for a, b in zip(qs[:-1], qs[1:]):
     sel = (effort >= a) & (effort < b)
     if sel.sum():
         cx.append(effort[sel].mean()); cy.append(deg_obs[sel].mean())
-ax.plot(cx, cy, "o-", color=NAVY, lw=2.2, ms=6, label="구간 평균")
-ax.legend(frameon=False, fontsize=10)
-ax.set_xlabel("연구량 (상대값)"); ax.set_ylabel("관측된 차수")
-ax.set_title(f"관측 차수 vs 연구량   ρ = {rho_eff:.2f}", color=NAVY, fontsize=12)
+MEAN_C = shade(C_OBS, 0.35)
+ax.plot(cx, cy, "o-", color=MEAN_C, lw=2.2, ms=5.5, zorder=4)
+ax.text(cx[-1] + 0.04, cy[-1], "구간 평균", color=MEAN_C, fontsize=11, fontweight="bold",
+        va="center", ha="left", zorder=5,
+        bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.85))
+ax.text(0.97, 0.97, f"ρ = {rho_eff:.2f}", transform=ax.transAxes, ha="right", va="top",
+        fontsize=12, fontweight="bold", color=TEXT)
+ax.set_xlabel("연구량 (상대값)", fontsize=11.5)
+ax.set_ylabel("관측된 차수", fontsize=11.5)
+ax.set_xlim(-0.03, 1.05); ax.set_ylim(-0.8, 10.8)
+ax.set_yticks([0, 2, 4, 6, 8, 10])
+marker(ax, "② 관측 차수 vs 연구량")
 
-# --- C. 상관 비교 ----------------------------------------------------------
-ax = axes[2]
-ax.bar(["진짜 차수", "연구량"], [rho_true, rho_eff], color=[BLUE, RED], width=0.5)
+# --- ③ 상관 비교 ----------------------------------------------------------
+ax = ax3
+cols = [C_TRUE, C_EFF]
+ax.bar([0, 1], [rho_true, rho_eff], color=cols, width=0.55, zorder=2)
 for i, val in enumerate([rho_true, rho_eff]):
-    ax.text(i, val + 0.015, f"{val:.2f}", ha="center", fontsize=12,
-            fontweight="bold", color=[BLUE, RED][i])
-ax.set_ylim(0, 0.6); ax.set_ylabel("관측 차수와의 스피어만 상관 ρ")
-ax.set_title("⚠ 관측 허브는 진짜 차수보다\n연구량을 더 잘 따라간다", color=NAVY,
-             fontsize=12)
+    ax.text(i, val + 0.015, f"{val:.2f}", ha="center", va="bottom", fontsize=12,
+            fontweight="bold", color=cols[i])
+ax.set_xticks([0, 1]); ax.set_xticklabels(["진짜 차수", "연구량"])
+ax.set_xlim(-0.6, 1.6)
+ax.set_ylim(0, 0.6); ax.set_yticks([0, 0.2, 0.4, 0.6])
+ax.set_ylabel("관측 차수와의\n스피어만 상관 ρ", fontsize=11.5)
+marker(ax, "③ 무엇을 더 따라가나")
 
-fig.suptitle("진짜 네트워크에는 허브가 없다 — 허브는 관측 과정이 만들었다",
-             color=NAVY, fontsize=13, fontweight="bold", y=1.03)
-fig.savefig(os.path.join(OUT, "study_bias.png"))
-print("wrote", os.path.join(OUT, "study_bias.png"))
+save(fig, img("c07", "study_bias.png"))
 print(f"진짜: 평균 {deg_true.mean():.2f} CV {deg_true.std()/deg_true.mean():.3f} "
       f"최대/평균 {deg_true.max()/deg_true.mean():.2f}")
 print(f"관측: 평균 {deg_obs.mean():.2f} CV {deg_obs.std()/deg_obs.mean():.3f} "
