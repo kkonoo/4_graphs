@@ -1,13 +1,12 @@
 """01 §3 — 임계값이 네트워크를 정한다.
 
-같은 상관 행렬, 세 개의 기준값.
+같은 상관 행렬, 세 개의 기준값. 위: 기준값에 따른 엣지 수, 아래: 세 기준값에서의 네트워크.
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from style import *
+from medfig import *
 import networkx as nx
-
-OUT = outdir("c01")
+from matplotlib.ticker import FixedLocator, NullLocator, FixedFormatter
 
 rng = np.random.default_rng(4)
 nmod, per = 4, 12
@@ -23,32 +22,54 @@ for i in range(n):
 ths = np.arange(0.30, 0.951, 0.01)
 counts = [(C > t).sum() // 2 for t in ths]
 
-fig = plt.figure(figsize=(15.6, 4.8))
-gs = fig.add_gridspec(1, 4, width_ratios=[1.30, 1, 1, 1], wspace=0.30)
+NEUTRAL = "#9AA1AB"
+MARK = ["①", "②", "③"]
+TH = [0.50, 0.60, 0.75]
+VERDICT = ["모듈이 맞닿아 경계가 불분명", "깔끔한 네 개의 모듈", "모듈이 조각남"]
 
-ax = fig.add_subplot(gs[0, 0])
-ax.plot(ths, counts, color=NAVY, lw=2.2)
-for t, col in [(0.50, ORANGE), (0.60, TEAL), (0.75, PURPLE)]:
-    ax.axvline(t, color=col, ls="--", lw=1.4)
-    ax.scatter([t], [(C > t).sum() // 2], color=col, zorder=5, s=38)
-ax.set_xlabel("상관 임계값  r")
-ax.set_ylabel("엣지 수")
-ax.set_title("임계값에 따른 엣지 수", color=NAVY, fontsize=12)
+fig = plt.figure(figsize=(8.4, 6.2))
+
+# ── 위: 기준값에 따른 엣지 수 ─────────────────────────────────────────────
+ax = fig.add_axes([0.11, 0.635, 0.84, 0.325])
+ax.plot(ths, counts, color=PRIMARY, lw=2.2, zorder=3)
+for t in TH:
+    ax.axvline(t, color=NEUTRAL, ls=(0, (4, 3)), lw=1.1, zorder=1)
+for t, txt in [(0.30, None), (0.50, "①"), (0.60, "②"), (0.75, "③"), (0.90, None)]:
+    e = (C > t).sum() // 2
+    print(f"r > {t:.2f}  엣지 {e}개")
+    main = txt is not None
+    ax.scatter([t], [e], s=40 if main else 30, color=TEXT if main else NEUTRAL, zorder=5, lw=0)
+    s = f"{txt} {e}" if main else f"{e}"
+    ax.annotate(s, (t, e), xytext=(7, 4), textcoords="offset points", ha="left", va="bottom",
+                fontsize=11.5 if main else 11, fontweight="bold" if main else "regular",
+                color=TEXT if main else TEXT2, zorder=6)
 ax.set_yscale("log")
+ax.set_ylim(10, 900)
+ax.yaxis.set_major_locator(FixedLocator([10, 20, 50, 100, 200, 500]))
+ax.yaxis.set_major_formatter(FixedFormatter(["10", "20", "50", "100", "200", "500"]))
+ax.yaxis.set_minor_locator(NullLocator())
+ax.set_xlim(0.28, 0.97)
+ax.set_xticks([0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
+ax.tick_params(labelsize=11)
+ax.grid(axis="y", color=LINE, lw=0.8, zorder=0)
+ax.set_xlabel("상관 임계값  r", fontsize=11.5)
+ax.set_ylabel("엣지 수", fontsize=11.5)
 
-cols = [[TEAL, PURPLE, OLIVE, ORANGE][l] for l in lab]
-for idx, (t, col) in enumerate([(0.50, ORANGE), (0.60, TEAL), (0.75, PURPLE)]):
+# ── 아래: 세 기준값의 네트워크 ───────────────────────────────────────────
+cols = [CAT[l] for l in lab]             # 실제 모듈 4개 (나란한 범주)
+for idx, t in enumerate(TH):
     G = nx.Graph((i, j) for i in range(n) for j in range(i + 1, n) if C[i, j] > t)
     G.add_nodes_from(range(n))
     pos = nx.spring_layout(G, seed=2, k=0.55)
-    ax = fig.add_subplot(gs[0, idx + 1])
-    nx.draw_networkx_edges(G, pos, ax=ax, edge_color=LGREY, width=0.6)
-    nx.draw_networkx_nodes(G, pos, ax=ax, node_color=cols, linewidths=0,
-                           node_size=48)
-    ax.set_title(f"r > {t:.2f}\n엣지 {G.number_of_edges()}개", color=col,
-                 fontsize=12)
-    ax.set_axis_off()
+    a = fig.add_axes([0.01 + idx * 0.333, 0.075, 0.315, 0.40])
+    nx.draw_networkx_edges(G, pos, ax=a, edge_color=LINE, width=0.6)
+    nx.draw_networkx_nodes(G, pos, ax=a, nodelist=list(range(n)), node_color=cols,
+                           linewidths=0, node_size=36)
+    a.margins(0.06); a.set_xticks([]); a.set_yticks([])
+    for sp in a.spines.values(): sp.set_visible(False)
+    a.text(0.5, 1.03, f"{MARK[idx]} r > {t:.2f} · 엣지 {G.number_of_edges()}개", transform=a.transAxes,
+           ha="center", va="bottom", fontsize=12, fontweight="bold", color=TEXT)
+    a.text(0.5, -0.03, VERDICT[idx], transform=a.transAxes, ha="center", va="top",
+           fontsize=11, color=TEXT2)
 
-fig.subplots_adjust(top=0.80)
-fig.savefig(os.path.join(OUT, "threshold.png"))
-print("wrote", os.path.join(OUT, "threshold.png"))
+save(fig, img("c01", "threshold.png"))
